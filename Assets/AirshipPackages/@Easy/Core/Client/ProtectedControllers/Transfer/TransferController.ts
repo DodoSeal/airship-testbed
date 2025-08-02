@@ -6,7 +6,6 @@ import { Controller, Dependency } from "@Easy/Core/Shared/Flamework";
 import { Game } from "@Easy/Core/Shared/Game";
 import { GameCoordinatorClient } from "@Easy/Core/Shared/TypePackages/game-coordinator-types";
 import { UnityMakeRequest } from "@Easy/Core/Shared/TypePackages/UnityMakeRequest";
-import { Result } from "@Easy/Core/Shared/Types/Result";
 import { AirshipUrl } from "@Easy/Core/Shared/Util/AirshipUrl";
 import inspect from "@Easy/Core/Shared/Util/Inspect";
 import { Signal } from "@Easy/Core/Shared/Util/Signal";
@@ -22,6 +21,8 @@ export const enum TransferControllerBridgeTopics {
 }
 
 export type ClientBridgeApiTransferRequested = (transfer: { gameId: string; serverId: string }) => void;
+export type ClientBridgeApiTransferToGame = (gameId: string, preferredServerId?: string) => AirshipTransferResult;
+export type ClientBridgeApiTransferToPartyLeader = () => AirshipTransferResult;
 
 interface SocketTransferData {
 	gameServer: AirshipGameServerConnectionInfo;
@@ -37,16 +38,19 @@ export class TransferController {
 	onTransferRequested: Signal<SocketTransferData> = new Signal<SocketTransferData>().WithAllowYield(true);
 
 	constructor(private readonly socketController: SocketController) {
-		contextbridge.callback(
+		contextbridge.callback<ClientBridgeApiTransferToGame>(
 			TransferControllerBridgeTopics.TransferToGame,
 			(from, gameId: string, preferredServerId?: string) => {
 				return this.TransferToGameAsync(gameId, preferredServerId).expect();
 			},
 		);
 
-		contextbridge.callback(TransferControllerBridgeTopics.TransferToPartyLeader, (from) => {
-			return this.TransferToPartyLeader().expect();
-		});
+		contextbridge.callback<ClientBridgeApiTransferToPartyLeader>(
+			TransferControllerBridgeTopics.TransferToPartyLeader,
+			(from) => {
+				return this.TransferToPartyLeader().expect();
+			},
+		);
 	}
 
 	protected OnStart(): void {
@@ -103,28 +107,14 @@ export class TransferController {
 	 * @param gameId Game id to join.
 	 * @param preferredServerId Specific ServerID to teleport to. If not included, the backend will select a server for you.
 	 */
-	public async TransferToGameAsync(
-		gameId: string,
-		preferredServerId?: string,
-	): Promise<Result<undefined, undefined>> {
+	public async TransferToGameAsync(gameId: string, preferredServerId?: string): Promise<AirshipTransferResult> {
 		let isPartyLeader = Dependency<MainMenuPartyController>().IsPartyLeader();
 
-		try {
-			await client.transfers.requestSelfTransfer({
-				gameId: gameId,
-				preferredServerId,
-				withParty: isPartyLeader,
-			});
-			return {
-				success: true,
-				data: undefined,
-			};
-		} catch {
-			return {
-				success: false,
-				error: undefined,
-			};
-		}
+		return await client.transfers.requestSelfTransfer({
+			gameId: gameId,
+			preferredServerId,
+			withParty: isPartyLeader,
+		});
 	}
 
 	/**

@@ -1,4 +1,8 @@
-import { TransferControllerBridgeTopics } from "@Easy/Core/Client/ProtectedControllers/Transfer/TransferController";
+import {
+	ClientBridgeApiTransferToGame,
+	ClientBridgeApiTransferToPartyLeader,
+	TransferControllerBridgeTopics,
+} from "@Easy/Core/Client/ProtectedControllers/Transfer/TransferController";
 import { Platform } from "@Easy/Core/Shared/Airship";
 import { AirshipTransferResult } from "@Easy/Core/Shared/Airship/Types/AirshipServerManager";
 import { Controller } from "@Easy/Core/Shared/Flamework";
@@ -41,7 +45,7 @@ export class AirshipTransferController {
 	 * @param preferredServerId Specific ServerID to teleport to. If not included, the backend will select a server for you.
 	 */
 	public async TransferToGame(gameId: string, preferredServerId?: string): Promise<AirshipTransferResult> {
-		return contextbridge.invoke(
+		return contextbridge.invoke<ClientBridgeApiTransferToGame>(
 			TransferControllerBridgeTopics.TransferToGame,
 			LuauContext.Protected,
 			gameId,
@@ -54,7 +58,10 @@ export class AirshipTransferController {
 	 * or the client is not in a party, this function will have no effect.
 	 */
 	public async TransferToPartyLeader(): Promise<AirshipTransferResult> {
-		return contextbridge.invoke(TransferControllerBridgeTopics.TransferToPartyLeader, LuauContext.Protected);
+		return contextbridge.invoke<ClientBridgeApiTransferToPartyLeader>(
+			TransferControllerBridgeTopics.TransferToPartyLeader,
+			LuauContext.Protected,
+		);
 	}
 
 	protected OnStart(): void {}
