@@ -1,4 +1,7 @@
-import { AirshipGameServerConnectionInfo } from "@Easy/Core/Shared/Airship/Types/AirshipServerManager";
+import {
+	AirshipGameServerConnectionInfo,
+	AirshipTransferResult,
+} from "@Easy/Core/Shared/Airship/Types/AirshipServerManager";
 import { Controller, Dependency } from "@Easy/Core/Shared/Flamework";
 import { Game } from "@Easy/Core/Shared/Game";
 import { GameCoordinatorClient } from "@Easy/Core/Shared/TypePackages/game-coordinator-types";
@@ -14,6 +17,8 @@ const client = new GameCoordinatorClient(UnityMakeRequest(AirshipUrl.GameCoordin
 
 export const enum TransferControllerBridgeTopics {
 	TransferRequested = "TransferController:TransferRequested",
+	TransferToPartyLeader = "TransferController:TransferToPartyLeader",
+	TransferToGame = "TransferController:TransferToGame",
 }
 
 export type ClientBridgeApiTransferRequested = (transfer: { gameId: string; serverId: string }) => void;
@@ -31,7 +36,18 @@ export class TransferController {
 	/** Fired when a transfer has been requested, just before the transfer will occur. */
 	onTransferRequested: Signal<SocketTransferData> = new Signal<SocketTransferData>().WithAllowYield(true);
 
-	constructor(private readonly socketController: SocketController) {}
+	constructor(private readonly socketController: SocketController) {
+		contextbridge.callback(
+			TransferControllerBridgeTopics.TransferToGame,
+			(from, gameId: string, preferredServerId?: string) => {
+				return this.TransferToGameAsync(gameId, preferredServerId).expect();
+			},
+		);
+
+		contextbridge.callback(TransferControllerBridgeTopics.TransferToPartyLeader, (from) => {
+			return this.TransferToPartyLeader().expect();
+		});
+	}
 
 	protected OnStart(): void {
 		this.socketController.On<SocketTransferData>("game-coordinator/server-transfer", (data) => {
@@ -115,31 +131,15 @@ export class TransferController {
 	 * Submits a request to transfer to the current party leader. If the party leader is not in a game,
 	 * or the client is not in a party, this function will have no effect.
 	 */
-	public async TransferToPartyLeader(): Promise<Result<undefined, undefined>> {
-		try {
-			await client.transfers.requestSelfToPartyTransfer();
-			return {
-				success: true,
-				data: undefined,
-			};
-		} catch {
-			return {
-				success: false,
-				error: undefined,
-			};
-		}
+	public async TransferToPartyLeader(): Promise<AirshipTransferResult> {
+		return await client.transfers.requestSelfToPartyTransfer();
 	}
 
 	/**
 	 * Submits a request to transfer party members to the party leader.
 	 * Only the party leader can send this request.
 	 */
-	public async TransferPartyMembersToLeader(): Promise<boolean> {
-		try {
-			await client.transfers.requestTransferPartyToSelf();
-			return true;
-		} catch {
-			return false;
-		}
+	public async TransferPartyMembersToLeader(): Promise<AirshipTransferResult> {
+		return await client.transfers.requestTransferPartyToSelf();
 	}
 }
