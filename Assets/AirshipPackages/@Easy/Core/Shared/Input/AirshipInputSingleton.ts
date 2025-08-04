@@ -197,6 +197,7 @@ export class AirshipInputSingleton {
 			{ name: CoreAction.Inventory, binding: Binding.Key(Key.E) },
 			{ name: CoreAction.Interact, binding: Binding.Key(Key.F) },
 			{ name: CoreAction.PushToTalk, binding: Binding.Key(Key.V) },
+			{ name: CoreAction.Emote, binding: Binding.Key(Key.B) },
 		]);
 
 		if (Game.IsProtectedLuauContext()) {
