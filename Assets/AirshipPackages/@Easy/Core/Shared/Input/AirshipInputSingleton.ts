@@ -1164,7 +1164,7 @@ export class AirshipInputSingleton {
 		for (const [name, data] of ObjectUtils.entries(keybinds)) {
 			const binding = this.CreateBindingFromSerializedAction(data);
 			const matchingAction = this.GetActions(name)[0];
-			if (!matchingAction || !matchingAction.isCore) return;
+			if (!matchingAction || !matchingAction.isCore) continue;
 			matchingAction.UpdateBinding(binding);
 			this.BroadcastProtectedKeybindUpdate(matchingAction);
 		}
