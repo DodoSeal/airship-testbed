@@ -172,7 +172,7 @@ export default class SettingsPage extends AirshipBehaviour {
 	protected Start(): void {
 		const settings = Protected.Settings;
 
-		this.sprintToggle.Init("Sprint Toggle", settings.GetSprintToggleEnabled());
+		this.sprintToggle.Init("Sprint Toggle", settings.IsSprintToggleEnabled());
 		this.sprintToggle.toggle.onValueChanged.Connect((val) => {
 			settings.SetSprintToggleEnabled(val);
 		});

@@ -67,8 +67,8 @@ export class ProtectedSettingsSingleton {
 
 		this.data = defaultData;
 
-		contextbridge.callback<() => boolean>("ClientSettings:GetSprintToggleEnabled", () => {
-			return this.GetSprintToggleEnabled();
+		contextbridge.callback<() => boolean>("ClientSettings:IsSprintToggleEnabled", () => {
+			return this.IsSprintToggleEnabled();
 		});
 
 		contextbridge.callback<() => number>("ClientSettings:GetMouseSensitivity", () => {
@@ -402,7 +402,7 @@ export class ProtectedSettingsSingleton {
 		}
 	}
 
-	public GetSprintToggleEnabled(): boolean {
+	public IsSprintToggleEnabled(): boolean {
 		return this.data.sprintToggleEnabled;
 	}
 

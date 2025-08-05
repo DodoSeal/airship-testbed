@@ -213,7 +213,7 @@ export class AirshipInputSingleton {
 
 		Airship.Input.OnDown(CoreAction.Sprint).Connect((event) => {
 			if (event.uiProcessed) return;
-			if (!this.GetSprintToggleEnabled()) return;
+			if (!this.IsSprintToggleEnabled()) return;
 
 			this.isSprintToggleSprinting = !this.isSprintToggleSprinting;
 		});
@@ -1233,8 +1233,8 @@ export class AirshipInputSingleton {
 	 *
 	 * @returns sprint toggle based on player's setting.
 	 */
-	public GetSprintToggleEnabled(): boolean {
-		return contextbridge.invoke<() => boolean>("ClientSettings:GetSprintToggleEnabled", LuauContext.Protected);
+	public IsSprintToggleEnabled(): boolean {
+		return contextbridge.invoke<() => boolean>("ClientSettings:IsSprintToggleEnabled", LuauContext.Protected);
 	}
 
 	/**
