@@ -27,22 +27,20 @@ export default class EditorDataStore {
 
 	private LockKeyInEditor(key: string, lock: AirshipDataStoreLockMode | undefined): boolean {
 		const currentData = this.db.get(key);
-		if (currentData === undefined) {
-			return false;
-		}
 
 		let lastUpdated: string = DateTime.now().ToISO();
 		let lockedAt: string;
-		if (currentData.lockedLocally === undefined) {
+		if (currentData?.lockedLocally === undefined) {
 			lockedAt = lastUpdated;
 		} else {
 			lockedAt = currentData.lockedLocally.lockedAt;
 		}
 
+		const currentValue = currentData?.value!; // Just leave it undefined if that's what it was before.
 		if (lock === undefined) {
-			this.db.set(key, { lockedLocally: undefined, value: currentData.value });
+			this.db.set(key, { lockedLocally: undefined, value: currentValue });
 		} else {
-			this.db.set(key, { lockedLocally: { mode: lock, lockedAt, lastUpdated }, value: currentData.value });
+			this.db.set(key, { lockedLocally: { mode: lock, lockedAt, lastUpdated }, value: currentValue });
 		}
 
 		return true;
