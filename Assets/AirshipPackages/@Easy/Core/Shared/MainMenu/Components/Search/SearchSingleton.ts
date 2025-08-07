@@ -3,11 +3,7 @@ import DateParser from "@Easy/Core/Shared/DateParser";
 import { Controller, Service } from "@Easy/Core/Shared/Flamework/flamework";
 import { Game } from "@Easy/Core/Shared/Game";
 import { ContentServiceClient, ContentServiceGames } from "@Easy/Core/Shared/TypePackages/content-service-types";
-import {
-	isUnityMakeRequestError,
-	UnityMakeRequest,
-	UnityMakeRequestError,
-} from "@Easy/Core/Shared/TypePackages/UnityMakeRequest";
+import { UnityMakeRequest, UnityMakeRequestError } from "@Easy/Core/Shared/TypePackages/UnityMakeRequest";
 import { AirshipUrl } from "@Easy/Core/Shared/Util/AirshipUrl";
 import ObjectUtils from "@Easy/Core/Shared/Util/ObjectUtils";
 import { ProtectedUtil } from "@Easy/Core/Shared/Util/ProtectedUtil";
@@ -64,7 +60,7 @@ export default class SearchSingleton {
 				this.myGamesIds.add(g.id);
 			}
 		} catch (err: unknown) {
-			if (isUnityMakeRequestError(err) && 400 <= err.status && err.status < 500) {
+			if (UnityMakeRequestError.IsInstance(err) && 400 <= err.status && err.status < 500) {
 				return;
 			}
 

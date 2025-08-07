@@ -59,7 +59,10 @@ export type UnityMakeRequestError = {
 	status: number;
 };
 
-export const UnityMakeRequestError = {
+/**
+ * Static helper functions which can be applied for a UnityMakeRequestError type.
+ */
+interface UnityMakeRequestErrorStaticFunctions {
 	/**
 	 * Checks if a thrown error fits the object shape of a known error.
 	 *
@@ -68,26 +71,43 @@ export const UnityMakeRequestError = {
 	 * @param err The thrown object to check.
 	 * @returns True if the thrown object follows the shape of the UnityMakeRequestError type, false otherwise.
 	 */
-	IsInstance: (err: unknown) => {
-		return isUnityMakeRequestError(err);
-	},
+	IsInstance(error: unknown): error is UnityMakeRequestError;
 	/**
 	 * Creates a friendly display text from the provided error based on conventional api responses.
 	 *
-	 * @param err The error to create the display text from.
+	 * @param error The error to create the display text from.
 	 * @param defaultValue A value which can be provided to guarantee a value is returned.
-	 * @returns The decoded error message or first validation error message if the error matches
-	 * 	a normal validation error, otherwise it will return the defaultValue.
+	 * @returns The decoded error message or first validation error, otherwise it will return the defaultValue.
 	 */
-	DisplayText: (err: UnityMakeRequestError, defaultValue?: string | undefined) => {
-		return UnityMakeRequestErrorDisplayText(err, defaultValue);
-	},
+	DisplayText(error: UnityMakeRequestError, defaultValue: string): string;
+	// DisplayText(error: UnityMakeRequestError) needs separate docs since it has no defaultValue defined.
+	/**
+	 * Creates a friendly display text from the provided error based on conventional api responses.
+	 *
+	 * @param error The error to create the display text from.
+	 * @returns The decoded error message or first validation error, otherwise it will return undefined.
+	 */
+	DisplayText(error: UnityMakeRequestError): string | undefined;
+	DisplayText(error: UnityMakeRequestError, defaultValue: string | undefined): string | undefined;
+}
+
+/**
+ * A helper object to operate on UnityMakeRequest errors.
+ */
+export const UnityMakeRequestError: UnityMakeRequestErrorStaticFunctions = {
+	IsInstance: IsUnityMakeRequestError,
+	DisplayText: UnityMakeRequestErrorDisplayText,
 };
 
-function UnityMakeRequestErrorDisplayText(
-	error: UnityMakeRequestError,
-	defaultValue?: string | undefined,
-): string | undefined {
+function IsUnityMakeRequestError(err: unknown): err is UnityMakeRequestError {
+	if (!err) return false;
+	const typedErr = err as Partial<UnityMakeRequestError>;
+	return typedErr.message !== undefined && typedErr.status !== undefined;
+}
+
+function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError): string | undefined;
+function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError, defaultValue: string): string;
+function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError, defaultValue?: string): string | undefined {
 	let responseMessage: string | undefined;
 	try {
 		// Attempt to extract the message property from the response object.
@@ -110,20 +130,6 @@ function UnityMakeRequestErrorDisplayText(
 		responseMessage = defaultValue;
 	}
 	return responseMessage;
-}
-
-/**
- * Checks if a thrown error fits the object shape of a known error.
- *
- * This provides type narrowing for the UnityMakeRequestError type.
- *
- * @param err The thrown object to check.
- * @returns True if the thrown object follows the shape of the UnityMakeRequestError type, false otherwise.
- */
-export function isUnityMakeRequestError(err: unknown): err is UnityMakeRequestError {
-	if (!err) return false;
-	const typedErr = err as Partial<UnityMakeRequestError>;
-	return typedErr.message !== undefined && typedErr.status !== undefined;
 }
 
 export function UnityMakeRequest(baseUrl: string): MakeRequest {

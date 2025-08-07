@@ -12,7 +12,7 @@ import { HttpRetryInstance } from "../../Http/HttpRetry";
 import { CoreLogger } from "../../Logger/CoreLogger";
 import { Protected } from "../../Protected";
 import { ContentServiceClient } from "../../TypePackages/content-service-types";
-import { isUnityMakeRequestError, UnityMakeRequest, UnityMakeRequestError } from "../../TypePackages/UnityMakeRequest";
+import { UnityMakeRequest, UnityMakeRequestError } from "../../TypePackages/UnityMakeRequest";
 import { AirshipUrl } from "../../Util/AirshipUrl";
 import { ColorUtil } from "../../Util/ColorUtil";
 import { RandomUtil } from "../../Util/RandomUtil";
