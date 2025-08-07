@@ -21,15 +21,9 @@ export default class DeleteAccountButton extends AirshipBehaviour {
 						"Are you sure you want to delete your account? This cannot be undone.",
 					);
 					if (!confirmed) return;
-					try {
-						await client.users.deleteUser();
-						AuthManager.ClearSavedAccount();
-						Bridge.LoadScene("Login", true, LoadSceneMode.Single);
-					} catch (err) {
-						if (isUnityMakeRequestError(err)) {
-							error((err.responseMessage() ?? "An unknown error occurred"));
-						}
-					}
+					await client.users.deleteUser();
+					AuthManager.ClearSavedAccount();
+					Bridge.LoadScene("Login", true, LoadSceneMode.Single);
 				});
 			}),
 		);
