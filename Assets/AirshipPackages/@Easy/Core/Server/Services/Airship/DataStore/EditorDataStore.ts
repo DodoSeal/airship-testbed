@@ -36,7 +36,7 @@ export default class EditorDataStore {
 			lockedAt = currentData.lockedLocally.lockedAt;
 		}
 
-		const currentValue = currentData?.value!; // Just leave it undefined if that's what it was before.
+		const currentValue = currentData !== undefined ? currentData.value : {}; // Default to an empty object if we lock a non-existant key. This is the behavior of the data store service.
 		if (lock === undefined) {
 			this.db.set(key, { lockedLocally: undefined, value: currentValue });
 		} else {
