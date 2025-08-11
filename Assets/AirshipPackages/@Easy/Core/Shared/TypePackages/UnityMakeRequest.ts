@@ -76,19 +76,9 @@ interface UnityMakeRequestErrorStaticFunctions {
 	 * Creates a friendly display text from the provided error based on conventional api responses.
 	 *
 	 * @param error The error to create the display text from.
-	 * @param defaultValue A value which can be provided to guarantee a value is returned.
-	 * @returns The decoded error message or first validation error, otherwise it will return the defaultValue.
-	 */
-	DisplayText(error: UnityMakeRequestError, defaultValue: string): string;
-	// DisplayText(error: UnityMakeRequestError) needs separate docs since it has no defaultValue defined.
-	/**
-	 * Creates a friendly display text from the provided error based on conventional api responses.
-	 *
-	 * @param error The error to create the display text from.
 	 * @returns The decoded error message or first validation error, otherwise it will return undefined.
 	 */
 	DisplayText(error: UnityMakeRequestError): string | undefined;
-	DisplayText(error: UnityMakeRequestError, defaultValue: string | undefined): string | undefined;
 }
 
 /**
@@ -105,9 +95,7 @@ function IsUnityMakeRequestError(err: unknown): err is UnityMakeRequestError {
 	return typedErr.message !== undefined && typedErr.status !== undefined;
 }
 
-function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError): string | undefined;
-function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError, defaultValue: string): string;
-function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError, defaultValue?: string): string | undefined {
+function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError): string | undefined {
 	let responseMessage: string | undefined;
 	try {
 		// Attempt to extract the message property from the response object.
@@ -124,10 +112,10 @@ function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError, defaultV
 				responseMessage = tostring(errObj.message);
 			}
 		} else {
-			responseMessage = defaultValue;
+			return;
 		}
 	} catch {
-		responseMessage = defaultValue;
+		return;
 	}
 	return responseMessage;
 }

@@ -84,7 +84,7 @@ export default class SearchSingleton {
 			});
 		} catch (err) {
 			if (UnityMakeRequestError.IsInstance(err)) {
-				const errorMessage = UnityMakeRequestError.DisplayText(err, "An unknown error occurred");
+				const errorMessage = UnityMakeRequestError.DisplayText(err) ?? "An unknown error occurred";
 				warn(`Failed to decode popular games: ${errorMessage}`);
 			}
 

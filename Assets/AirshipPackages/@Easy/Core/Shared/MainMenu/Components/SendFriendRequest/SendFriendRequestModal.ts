@@ -124,10 +124,8 @@ export default class SendFriendRequestModal extends AirshipBehaviour {
 			this.inputOutlineGO.SetActive(true);
 		} catch (err) {
 			if (UnityMakeRequestError.IsInstance(err)) {
-				this.responseText.text = UnityMakeRequestError.DisplayText(
-					err,
-					"Failed to send friend request. Please try again later.",
-				);
+				this.responseText.text =
+					UnityMakeRequestError.DisplayText(err) ?? "Failed to send friend request. Please try again later.";
 			} else {
 				this.responseText.text = "Failed to send friend request. Please try again later.";
 			}
