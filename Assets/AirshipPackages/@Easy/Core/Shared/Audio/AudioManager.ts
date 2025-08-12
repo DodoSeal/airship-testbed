@@ -1,9 +1,6 @@
 import { CoreRefs } from "@Easy/Core/Shared/CoreRefs";
 import { Asset } from "../Asset";
 import StringUtils from "../Types/StringUtil";
-
-const MAX_DISTANCE = 18;
-
 /**
  * Configuration for the Audio Source that will play your Audio Clip.
  */
@@ -84,6 +81,7 @@ interface CleanupQueueItem {
 export class AudioManager {
 	private static audioSourceTemplate: GameObject | undefined;
 	private static globalAudioSources: Map<number, AudioSource> = new Map();
+	private static pooledAudioMap: Map<AudioSource, PlaySoundConfig> = new Map();
 
 	private static cleanupQueue = new Set<CleanupQueueItem>();
 
@@ -119,6 +117,7 @@ export class AudioManager {
 							if (item.isGlobal) {
 								this.globalAudioSources.delete(item.audioSource.gameObject.GetInstanceID());
 							}
+							this.RestoreConfigOnRelease(item.audioSource);
 							PoolManager.ReleaseObject(item.audioSource.gameObject);
 						});
 						toRemove.push(item);
@@ -189,16 +188,22 @@ export class AudioManager {
 			return undefined;
 		}
 
-		const audioSource = this.GetAudioSource(Vector3.zero, config?.audioSourceTemplate);
-		const providedAudioSource = config?.audioSourceTemplate !== undefined;
+		const configWithDefaults = this.GetSoundConfigWithDefaults(config);
+		const audioSource = this.GetAudioSource(Vector3.zero, configWithDefaults);
+		const providedAudioSource = configWithDefaults.audioSourceTemplate !== undefined;
 
 		audioSource.spatialBlend = 0;
-		if (config?.loop !== undefined || !providedAudioSource) audioSource.loop = config?.loop ?? false;
-		if (config?.pitch !== undefined || !providedAudioSource) audioSource.pitch = config?.pitch ?? 1;
-		if (config?.panStereo !== undefined || !providedAudioSource) audioSource.panStereo = config?.panStereo ?? 0;
-		if (config?.volumeScale !== undefined || !providedAudioSource) audioSource.volume = config?.volumeScale ?? 1;
-		if (config?.mixerGroup !== undefined || !providedAudioSource)
-			audioSource.outputAudioMixerGroup = config?.mixerGroup!;
+
+		if (!providedAudioSource) {
+			audioSource.volume = configWithDefaults.volumeScale;
+			audioSource.loop = configWithDefaults.loop;
+			audioSource.pitch = configWithDefaults.pitch;
+			audioSource.panStereo = configWithDefaults.panStereo;
+		}
+
+		if (configWithDefaults.mixerGroup) {
+			audioSource.outputAudioMixerGroup = configWithDefaults.mixerGroup;
+		}
 
 		audioSource.resource = audioResource;
 		audioSource.PlayDelayed(0.01);
@@ -253,30 +258,31 @@ export class AudioManager {
 			return undefined;
 		}
 
-		const audioSource = this.GetAudioSource(position, config?.audioSourceTemplate);
-		const providedAudioSource = config?.audioSourceTemplate !== undefined;
-		audioSource.spatialBlend = 1;
+		const configWithDefaults = this.GetSoundConfigWithDefaults(config);
+		const audioSource = this.GetAudioSource(position, configWithDefaults);
+		const providedAudioSource = configWithDefaults.audioSourceTemplate !== undefined;
 
-		if (config?.loop !== undefined || !providedAudioSource) audioSource.loop = config?.loop ?? false;
-		if (config?.rollOffMode !== undefined || !providedAudioSource)
-			audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
-		if (config?.rolloffCustomCurve !== undefined) {
+		if (!providedAudioSource) {
+			audioSource.volume = configWithDefaults.volumeScale;
+			audioSource.loop = configWithDefaults.loop;
+			audioSource.pitch = configWithDefaults.pitch;
+			audioSource.panStereo = configWithDefaults.panStereo;
+			audioSource.maxDistance = configWithDefaults.maxDistance;
+			audioSource.minDistance = configWithDefaults.minDistance;
+			audioSource.rolloffMode = configWithDefaults.rollOffMode;
+			audioSource.dopplerLevel = configWithDefaults.dopplerLevel;
+		}
+
+		if (configWithDefaults.rolloffCustomCurve) {
 			audioSource.rolloffMode = AudioRolloffMode.Custom;
-			audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
+			audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, configWithDefaults.rolloffCustomCurve);
 		}
-		if (config?.maxDistance !== undefined || !providedAudioSource)
-			audioSource.maxDistance = config?.maxDistance ?? 500;
-		if (config?.minDistance !== undefined || !providedAudioSource)
-			audioSource.minDistance = config?.minDistance ?? 1;
-		if (config?.pitch !== undefined || !providedAudioSource) audioSource.pitch = config?.pitch ?? 1;
-		if (config?.panStereo !== undefined || !providedAudioSource) audioSource.panStereo = config?.panStereo ?? 0;
-		if (config?.volumeScale !== undefined || !providedAudioSource) audioSource.volume = config?.volumeScale ?? 1;
-		if (config?.dopplerLevel !== undefined || !providedAudioSource) {
-			audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
-		}
-		if (config?.mixerGroup !== undefined || !providedAudioSource)
-			audioSource.outputAudioMixerGroup = config?.mixerGroup!;
 
+		if (configWithDefaults.mixerGroup) {
+			audioSource.outputAudioMixerGroup = configWithDefaults.mixerGroup;
+		}
+
+		audioSource.spatialBlend = 1;
 		audioSource.resource = audioResource;
 		audioSource.PlayDelayed(0.01);
 
@@ -291,9 +297,9 @@ export class AudioManager {
 		return audioSource;
 	}
 
-	private static GetAudioSource(position: Vector3, customAudioSourceTemplate?: GameObject): AudioSource {
-		if (customAudioSourceTemplate) {
-			const go = Object.Instantiate(customAudioSourceTemplate, position, Quaternion.identity);
+	private static GetAudioSource(position: Vector3, defaultedConfig: PlaySoundConfig): AudioSource {
+		if (defaultedConfig.audioSourceTemplate) {
+			const go = Object.Instantiate(defaultedConfig.audioSourceTemplate, position, Quaternion.identity);
 			const audioSource = go.GetComponent<AudioSource>();
 			assert(
 				audioSource,
@@ -304,11 +310,59 @@ export class AudioManager {
 		if (!this.audioSourceTemplate) {
 			this.CacheAudioSources();
 		}
+
 		const go = PoolManager.SpawnObject(this.audioSourceTemplate!, position, Quaternion.identity);
 		// const go = Object.Instantiate(this.audioSourceTemplate!, position, Quaternion.identity);
 		go.transform.SetParent(CoreRefs.rootTransform);
 		go.SetActive(true);
-		return go.GetComponent<AudioSource>()!;
+		const goAudioSource = go.GetComponent<AudioSource>();
+		this.pooledAudioMap.set(goAudioSource!, defaultedConfig);
+		return goAudioSource!;
+	}
+
+	/**
+	 * Ensures all config properties have default values
+	 */
+	private static GetSoundConfigWithDefaults(config?: PlaySoundConfig): {
+		volumeScale: number;
+		loop: boolean;
+		pitch: number;
+		panStereo: number;
+		maxDistance: number;
+		minDistance: number;
+		rollOffMode: AudioRolloffMode;
+		dopplerLevel: number;
+		rolloffCustomCurve?: AnimationCurve;
+		audioSourceTemplate?: GameObject;
+		mixerGroup?: AudioMixerGroup;
+	} {
+		return {
+			volumeScale: config?.volumeScale ?? 1,
+			loop: config?.loop ?? false,
+			pitch: config?.pitch ?? 1,
+			panStereo: config?.panStereo ?? 0,
+			maxDistance: config?.maxDistance ?? 500,
+			minDistance: config?.minDistance ?? 1,
+			rollOffMode: config?.rollOffMode ?? AudioRolloffMode.Logarithmic,
+			dopplerLevel: config?.dopplerLevel ?? 0,
+			rolloffCustomCurve: config?.rolloffCustomCurve,
+			audioSourceTemplate: config?.audioSourceTemplate,
+			mixerGroup: config?.mixerGroup,
+		};
+	}
+
+	private static RestoreConfigOnRelease(audioSource: AudioSource): void {
+		const config = this.pooledAudioMap.get(audioSource);
+		if (config) {
+			audioSource.volume = config.volumeScale!;
+			audioSource.loop = config.loop!;
+			audioSource.pitch = config.pitch!;
+			audioSource.panStereo = config.panStereo!;
+			audioSource.maxDistance = config.maxDistance!;
+			audioSource.minDistance = config.minDistance!;
+			audioSource.rolloffMode = config.rollOffMode!;
+			audioSource.dopplerLevel = config.dopplerLevel!;
+		}
 	}
 
 	private static FriendlyPath(s: string): string {
