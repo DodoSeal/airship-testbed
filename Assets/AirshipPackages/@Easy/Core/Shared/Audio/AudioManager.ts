@@ -23,6 +23,10 @@ export interface PlaySoundConfig {
 	 */
 	pitch?: number;
 	/**
+	 * Sets the stereo pan of the Audio Source.
+	 */
+	panStereo?: number;
+	/**
 	 * Sets the max distance of the Audio Source.
 	 */
 	maxDistance?: number;
@@ -191,6 +195,7 @@ export class AudioManager {
 		audioSource.spatialBlend = 0;
 		if (config?.loop !== undefined || !providedAudioSource) audioSource.loop = config?.loop ?? false;
 		if (config?.pitch !== undefined || !providedAudioSource) audioSource.pitch = config?.pitch ?? 1;
+		if (config?.panStereo !== undefined || !providedAudioSource) audioSource.panStereo = config?.panStereo ?? 0;
 		if (config?.volumeScale !== undefined || !providedAudioSource) audioSource.volume = config?.volumeScale ?? 1;
 		if (config?.mixerGroup !== undefined || !providedAudioSource)
 			audioSource.outputAudioMixerGroup = config?.mixerGroup!;
@@ -264,6 +269,7 @@ export class AudioManager {
 		if (config?.minDistance !== undefined || !providedAudioSource)
 			audioSource.minDistance = config?.minDistance ?? 1;
 		if (config?.pitch !== undefined || !providedAudioSource) audioSource.pitch = config?.pitch ?? 1;
+		if (config?.panStereo !== undefined || !providedAudioSource) audioSource.panStereo = config?.panStereo ?? 0;
 		if (config?.volumeScale !== undefined || !providedAudioSource) audioSource.volume = config?.volumeScale ?? 1;
 		if (config?.dopplerLevel !== undefined || !providedAudioSource) {
 			audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
