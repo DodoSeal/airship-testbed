@@ -71,22 +71,22 @@ interface UnityMakeRequestErrorStaticFunctions {
 	 * @param err The thrown object to check.
 	 * @returns True if the thrown object follows the shape of the UnityMakeRequestError type, false otherwise.
 	 */
-	IsInstance(error: unknown): error is UnityMakeRequestError;
+	IsInstance: (err: unknown) => err is UnityMakeRequestError;
 	/**
 	 * Creates a friendly display text from the provided error based on conventional api responses.
 	 *
 	 * @param error The error to create the display text from.
 	 * @returns The decoded error message or first validation error, otherwise it will return undefined.
 	 */
-	DisplayText(error: UnityMakeRequestError): string | undefined;
+	DisplayText: (error: UnityMakeRequestError) => string | undefined;
 }
 
 /**
  * A helper object to operate on UnityMakeRequest errors.
  */
 export const UnityMakeRequestError: UnityMakeRequestErrorStaticFunctions = {
-	IsInstance: IsUnityMakeRequestError,
-	DisplayText: UnityMakeRequestErrorDisplayText,
+	IsInstance: (err) => IsUnityMakeRequestError(err),
+	DisplayText: (err) => UnityMakeRequestErrorDisplayText(err),
 };
 
 function IsUnityMakeRequestError(err: unknown): err is UnityMakeRequestError {
@@ -95,12 +95,12 @@ function IsUnityMakeRequestError(err: unknown): err is UnityMakeRequestError {
 	return typedErr.message !== undefined && typedErr.status !== undefined;
 }
 
-function UnityMakeRequestErrorDisplayText(error: UnityMakeRequestError): string | undefined {
+function UnityMakeRequestErrorDisplayText(err: UnityMakeRequestError): string | undefined {
 	let responseMessage: string | undefined;
 	try {
 		// Attempt to extract the message property from the response object.
 		// It is an array if the error is from our backend validation framework
-		const errObj = json.decode<{ message: unknown }>(error.message);
+		const errObj = json.decode<{ message: unknown }>(err.message);
 		if (errObj.message) {
 			if (typeIs(errObj.message, "string")) {
 				responseMessage = errObj.message;
