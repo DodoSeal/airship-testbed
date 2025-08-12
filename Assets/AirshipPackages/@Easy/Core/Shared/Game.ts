@@ -1,3 +1,4 @@
+import { Airship } from "./Airship";
 import type { AirshipGameWithOrg } from "./Airship/Types/AirshipGame";
 import { CoreContext } from "./CoreClientContext";
 import { CoreNetwork } from "./CoreNetwork";
@@ -29,6 +30,8 @@ export class Game {
 	 * Fired when the local player opens the Main Menu (escape key).
 	 *
 	 * You can also use {@link IsMenuOpen()} to check if opened.
+	 *
+	 * @deprecated use `Airship.Menu.onMenuOpened` instead
 	 */
 	public static readonly onMenuOpened = new Signal<[opened: boolean]>();
 
@@ -85,6 +88,8 @@ export class Game {
 	 * Used to check if the Airship Escape Menu is opened.
 	 *
 	 * @returns True if the Airship Escape Menu is open.
+	 *
+	 * @deprecated Use `Airship.Menu.IsMenuOpen()` instead.
 	 */
 	public static IsMenuOpen(): boolean {
 		if (Game.IsGameLuauContext()) {
@@ -180,7 +185,15 @@ export class Game {
 			if (Game.deviceType === AirshipDeviceType.Tablet) {
 				return dpi / 180;
 			}
-			return math.max(2.5555, dpi / 180);
+			print("dpi: " + dpi);
+
+			// iPhone 7 scaling
+			// if (Game.platform === AirshipPlatform.iOS && dpi < 326) {
+			// 	return dpi / 180;
+			// }
+
+			return dpi / 180;
+			// return math.max(2.5555, dpi / 180);
 		} else if (dpi >= 255) {
 			return 1.75;
 		} else {
@@ -215,6 +228,7 @@ export class Game {
 
 if (Game.IsGameLuauContext()) {
 	contextbridge.subscribe("Game:MenuToggled", (from, opened: boolean) => {
+		Airship.Menu.onMenuToggled.Fire(opened);
 		Game.onMenuOpened.Fire(opened);
 	});
 }
