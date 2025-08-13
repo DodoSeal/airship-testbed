@@ -31356,6 +31356,7 @@ interface GameConfig extends ScriptableObject {
     queriesHitBackfaces: boolean;
     queriesHitTriggers: boolean;
     supportsMobile: boolean;
+    compileURPShaders: boolean;
 
 
 
@@ -37539,6 +37540,7 @@ interface BridgeConstructor {
     RemoveRichText(input: string): string;
     RequestMicrophonePermissionAsync(): void;
     ScreenPointToLocalPointInRectangle(rectTransform: RectTransform, screenPoint: Vector2): Vector2;
+    SetDefaultAudioSourceValues(source: AudioSource): void;
     SetFullScreen(value: boolean): void;
     SetMicDeviceIndex(i: number): void;
     SetParentToSceneRoot(transform: Transform): void;
