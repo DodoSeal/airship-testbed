@@ -194,6 +194,7 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
+			// Backwards compatibility
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
@@ -274,6 +275,7 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
+			// Backwards compatibility
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
