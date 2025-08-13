@@ -211,7 +211,6 @@ export class AudioManager {
 				if (config?.rolloffCustomCurve) {
 					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
 				}
-				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
 		this.SetAudioValuesToConfig(audioSource, config);
@@ -292,7 +291,6 @@ export class AudioManager {
 				if (config?.rolloffCustomCurve) {
 					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
 				}
-				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
 		this.SetAudioValuesToConfig(audioSource, config);
