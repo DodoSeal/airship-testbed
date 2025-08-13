@@ -138,7 +138,8 @@ export class AudioManager {
 	private static CacheAudioSources() {
 		//Create a reference for all future audio sources
 		this.audioSourceTemplate = GameObject.Create("PooledAudioSource");
-		this.audioSourceTemplate.AddComponent<AudioSource>();
+		const audioSource = this.audioSourceTemplate.AddComponent<AudioSource>();
+		Bridge.SetDefaultAudioSourceValues(audioSource);
 		this.audioSourceTemplate.SetActive(false);
 		this.audioSourceTemplate.transform.SetParent(CoreRefs.rootTransform);
 
@@ -292,13 +293,10 @@ export class AudioManager {
 		}
 
 		const go = PoolManager.SpawnObject(this.audioSourceTemplate!, position, Quaternion.identity);
-		const audioSource = go.GetComponent<AudioSource>();
-		assert(audioSource, "This Audio Game Object does not have an Audio Source component on it.");
-		Bridge.SetDefaultAudioSourceValues(audioSource);
 		// const go = Object.Instantiate(this.audioSourceTemplate!, position, Quaternion.identity);
 		go.transform.SetParent(CoreRefs.rootTransform);
 		go.SetActive(true);
-		return audioSource;
+		return go.GetComponent<AudioSource>()!;
 	}
 
 	private static SetAudioValuesToConfig(audioSource: AudioSource, playSoundConfig?: PlaySoundConfig) {
