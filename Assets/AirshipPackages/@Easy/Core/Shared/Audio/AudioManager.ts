@@ -120,7 +120,6 @@ export class AudioManager {
 							if (item.isGlobal) {
 								this.globalAudioSources.delete(item.audioSource.gameObject.GetInstanceID());
 							}
-							this.SetAudioValuesToConfig(item.audioSource, item.playSoundConfig);
 							PoolManager.ReleaseObject(item.audioSource.gameObject);
 						});
 						toRemove.push(item);
@@ -195,13 +194,27 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
+			// Backwards compatibility
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
-				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+				audioSource.volume = config?.volumeScale ?? 1;
+				audioSource.loop = config?.loop ?? false;
+				audioSource.pitch = config?.pitch ?? 1;
+				audioSource.panStereo = config?.panStereo ?? 0;
+				audioSource.minDistance = config?.minDistance ?? 1;
+				audioSource.maxDistance = config?.maxDistance ?? 500;
+				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
+				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				if (config?.mixerGroup) {
+					audioSource.outputAudioMixerGroup = config.mixerGroup;
+				}
+				if (config?.rolloffCustomCurve) {
+					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
+				}
 			}
-			this.SetAudioValuesToConfig(audioSource, config);
 		}
+		this.SetAudioValuesToConfig(audioSource, config);
 
 		audioSource.spatialBlend = 0;
 		audioSource.resource = audioResource;
@@ -262,13 +275,27 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
+			// Backwards compatibility
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
-				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+				audioSource.volume = config?.volumeScale ?? 1;
+				audioSource.loop = config?.loop ?? false;
+				audioSource.pitch = config?.pitch ?? 1;
+				audioSource.panStereo = config?.panStereo ?? 0;
+				audioSource.minDistance = config?.minDistance ?? 1;
+				audioSource.maxDistance = config?.maxDistance ?? 500;
+				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
+				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				if (config?.mixerGroup) {
+					audioSource.outputAudioMixerGroup = config.mixerGroup;
+				}
+				if (config?.rolloffCustomCurve) {
+					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
+				}
 			}
-			this.SetAudioValuesToConfig(audioSource, config);
 		}
+		this.SetAudioValuesToConfig(audioSource, config);
 
 		audioSource.spatialBlend = 1;
 		audioSource.resource = audioResource;
