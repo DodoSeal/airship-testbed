@@ -195,7 +195,11 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
-			Bridge.SetDefaultAudioSourceValues(audioSource);
+			try {
+				Bridge.SetDefaultAudioSourceValues(audioSource);
+			} catch (err) {
+				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+			}
 			this.SetAudioValuesToConfig(audioSource, config);
 		}
 
@@ -258,7 +262,11 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
-			Bridge.SetDefaultAudioSourceValues(audioSource);
+			try {
+				Bridge.SetDefaultAudioSourceValues(audioSource);
+			} catch (err) {
+				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+			}
 			this.SetAudioValuesToConfig(audioSource, config);
 		}
 
