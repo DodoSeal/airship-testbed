@@ -43,6 +43,7 @@ export default class AvatarViewComponent extends AirshipBehaviour {
 	public freeSpinDrag = 3;
 	public cameraTransitionDuration = 1;
 	public screenspaceDistance = 3;
+	public minDragSpeed = 0.15;
 
 	public oddsOfAReaction = 0.25;
 
@@ -114,8 +115,18 @@ export default class AvatarViewComponent extends AirshipBehaviour {
 		}
 		this.bin.Add(
 			OnUpdate.Connect((dt) => {
-				// Spin velocity
-				if (!this.dragging && math.abs(this.spinVel) > 0.01) {
+
+				if (this.dragging) {
+					const mouseX = Input.GetAxis("Mouse X");
+					let vel = mouseX * this.dragSpeedMod * Time.deltaTime;
+					this.currentCamAngle += vel;
+
+					if (math.abs(vel) > this.minDragSpeed) {
+						this.spinVel = vel;
+					} else {
+						this.spinVel = 0;
+					}
+				} else if (!this.dragging && math.abs(this.spinVel) > this.minDragSpeed) {
 					this.freeSpinning = true;
 					this.spinVel = this.spinVel * (1 - dt * this.freeSpinDrag);
 					this.currentCamAngle += this.spinVel;
@@ -125,32 +136,6 @@ export default class AvatarViewComponent extends AirshipBehaviour {
 
 				const rotation = Quaternion.Euler(0, this.currentCamAngle, 0);
 				this.cameraRig.rotation = rotation;
-			}),
-		);
-
-		this.bin.Add(
-			Mouse.onMoved.Connect((pos: Vector2) => {
-				if (this.dragging) {
-					// let diff = pos.sub(this.lastMousePos);
-
-					const mouseX = Input.GetAxis("Mouse X");
-
-					let vel = mouseX * this.dragSpeedMod * Time.deltaTime;
-					this.currentCamAngle += vel;
-
-					if (math.abs(vel) > 0.15) {
-						this.spinVel = vel;
-					} else {
-						this.spinVel = 0;
-					}
-
-					// print("mouse x: " + mouseX + ", vel: " + this.spinVel);
-
-					// let vel = diff.x * -this.dragSpeedMod;
-					// this.avatarHolder?.Rotate(0, vel, 0);
-					// this.spinVel = vel;
-					// this.UpdateSpinAnimation();
-				}
 			}),
 		);
 
