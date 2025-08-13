@@ -139,7 +139,6 @@ export class AudioManager {
 		//Create a reference for all future audio sources
 		this.audioSourceTemplate = GameObject.Create("PooledAudioSource");
 		const audioSource = this.audioSourceTemplate.AddComponent<AudioSource>();
-		Bridge.SetDefaultAudioSourceValues(audioSource);
 		this.audioSourceTemplate.SetActive(false);
 		this.audioSourceTemplate.transform.SetParent(CoreRefs.rootTransform);
 
@@ -195,12 +194,12 @@ export class AudioManager {
 		const audioSource = this.GetAudioSource(Vector3.zero, config?.audioSourceTemplate);
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
-		audioSource.spatialBlend = 0;
-
 		if (!providedAudioSource) {
+			Bridge.SetDefaultAudioSourceValues(audioSource);
 			this.SetAudioValuesToConfig(audioSource, config);
 		}
 
+		audioSource.spatialBlend = 0;
 		audioSource.resource = audioResource;
 		audioSource.PlayDelayed(0.01);
 
@@ -259,6 +258,7 @@ export class AudioManager {
 		const providedAudioSource = config?.audioSourceTemplate !== undefined;
 
 		if (!providedAudioSource) {
+			Bridge.SetDefaultAudioSourceValues(audioSource);
 			this.SetAudioValuesToConfig(audioSource, config);
 		}
 
