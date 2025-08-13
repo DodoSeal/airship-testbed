@@ -120,7 +120,6 @@ export class AudioManager {
 							if (item.isGlobal) {
 								this.globalAudioSources.delete(item.audioSource.gameObject.GetInstanceID());
 							}
-							this.SetAudioValuesToConfig(item.audioSource, item.playSoundConfig);
 							PoolManager.ReleaseObject(item.audioSource.gameObject);
 						});
 						toRemove.push(item);
@@ -198,10 +197,11 @@ export class AudioManager {
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
+				
 				warn("AudioManager: Setting default audio source values failed, on an old C# client");
 			}
-			this.SetAudioValuesToConfig(audioSource, config);
 		}
+		this.SetAudioValuesToConfig(audioSource, config);
 
 		audioSource.spatialBlend = 0;
 		audioSource.resource = audioResource;
@@ -267,8 +267,8 @@ export class AudioManager {
 			} catch (err) {
 				warn("AudioManager: Setting default audio source values failed, on an old C# client");
 			}
-			this.SetAudioValuesToConfig(audioSource, config);
 		}
+		this.SetAudioValuesToConfig(audioSource, config);
 
 		audioSource.spatialBlend = 1;
 		audioSource.resource = audioResource;
