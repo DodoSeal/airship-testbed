@@ -60,6 +60,24 @@ export interface PlaySoundConfig {
 	mixerGroup?: AudioMixerGroup;
 }
 
+/**
+ * Finalized Play Sound Config is the config that is used when setting config values + defaults if they are missing
+ * This should contain all the values that are set in PlaySoundConfig
+ */
+interface FinalizedPlaySoundConfig {
+	volumeScale: number;
+	loop: boolean;
+	pitch: number;
+	panStereo: number;
+	maxDistance: number;
+	minDistance: number;
+	rollOffMode: AudioRolloffMode;
+	rolloffCustomCurve?: AnimationCurve;
+	dopplerLevel: number;
+	audioSourceTemplate?: GameObject;
+	mixerGroup?: AudioMixerGroup;
+}
+
 interface PositionalPlaySoundConfig extends PlaySoundConfig {
 	/**
 	 * If a position is supplied this sound will be played positionally.
@@ -71,6 +89,7 @@ interface CleanupQueueItem {
 	audioSource: AudioSource;
 	aliveUntil?: number;
 	isGlobal: boolean;
+	finalizedPlaySoundConfig: FinalizedPlaySoundConfig;
 }
 
 /**
@@ -81,7 +100,6 @@ interface CleanupQueueItem {
 export class AudioManager {
 	private static audioSourceTemplate: GameObject | undefined;
 	private static globalAudioSources: Map<number, AudioSource> = new Map();
-	private static pooledAudioMap: Map<AudioSource, PlaySoundConfig> = new Map();
 
 	private static cleanupQueue = new Set<CleanupQueueItem>();
 
@@ -117,7 +135,7 @@ export class AudioManager {
 							if (item.isGlobal) {
 								this.globalAudioSources.delete(item.audioSource.gameObject.GetInstanceID());
 							}
-							this.RestoreConfigOnRelease(item.audioSource);
+							this.ResetAudioValuesOnRelease(item.audioSource, item.finalizedPlaySoundConfig);
 							PoolManager.ReleaseObject(item.audioSource.gameObject);
 						});
 						toRemove.push(item);
@@ -215,6 +233,7 @@ export class AudioManager {
 				audioSource,
 				aliveUntil: clip ? Time.unscaledTime + clip.length + 1 : undefined,
 				isGlobal: true,
+				finalizedPlaySoundConfig: configWithDefaults,
 			});
 		}
 		return audioSource;
@@ -292,6 +311,7 @@ export class AudioManager {
 				audioSource,
 				aliveUntil: clip ? Time.unscaledTime + clip.length + 1 : undefined,
 				isGlobal: false,
+				finalizedPlaySoundConfig: configWithDefaults,
 			});
 		}
 		return audioSource;
@@ -315,27 +335,13 @@ export class AudioManager {
 		// const go = Object.Instantiate(this.audioSourceTemplate!, position, Quaternion.identity);
 		go.transform.SetParent(CoreRefs.rootTransform);
 		go.SetActive(true);
-		const goAudioSource = go.GetComponent<AudioSource>();
-		this.pooledAudioMap.set(goAudioSource!, defaultedConfig);
-		return goAudioSource!;
+		return go.GetComponent<AudioSource>()!;
 	}
 
 	/**
 	 * Ensures all config properties have default values
 	 */
-	private static GetSoundConfigWithDefaults(config?: PlaySoundConfig): {
-		volumeScale: number;
-		loop: boolean;
-		pitch: number;
-		panStereo: number;
-		maxDistance: number;
-		minDistance: number;
-		rollOffMode: AudioRolloffMode;
-		dopplerLevel: number;
-		rolloffCustomCurve?: AnimationCurve;
-		audioSourceTemplate?: GameObject;
-		mixerGroup?: AudioMixerGroup;
-	} {
+	private static GetSoundConfigWithDefaults(config?: PlaySoundConfig): FinalizedPlaySoundConfig {
 		return {
 			volumeScale: config?.volumeScale ?? 1,
 			loop: config?.loop ?? false,
@@ -351,17 +357,25 @@ export class AudioManager {
 		};
 	}
 
-	private static RestoreConfigOnRelease(audioSource: AudioSource): void {
-		const config = this.pooledAudioMap.get(audioSource);
-		if (config) {
-			audioSource.volume = config.volumeScale!;
-			audioSource.loop = config.loop!;
-			audioSource.pitch = config.pitch!;
-			audioSource.panStereo = config.panStereo!;
-			audioSource.maxDistance = config.maxDistance!;
-			audioSource.minDistance = config.minDistance!;
-			audioSource.rolloffMode = config.rollOffMode!;
-			audioSource.dopplerLevel = config.dopplerLevel!;
+	private static ResetAudioValuesOnRelease(audioSource: AudioSource, playSoundConfig: FinalizedPlaySoundConfig) {
+		if (audioSource.volume !== playSoundConfig.volumeScale) audioSource.volume = playSoundConfig.volumeScale;
+		if (audioSource.loop !== playSoundConfig.loop) audioSource.loop = playSoundConfig.loop;
+		if (audioSource.pitch !== playSoundConfig.pitch) audioSource.pitch = playSoundConfig.pitch;
+		if (audioSource.panStereo !== playSoundConfig.panStereo) audioSource.panStereo = playSoundConfig.panStereo;
+		if (audioSource.maxDistance !== playSoundConfig.maxDistance)
+			audioSource.maxDistance = playSoundConfig.maxDistance;
+		if (audioSource.minDistance !== playSoundConfig.minDistance)
+			audioSource.minDistance = playSoundConfig.minDistance;
+		if (audioSource.rolloffMode !== playSoundConfig.rollOffMode)
+			audioSource.rolloffMode = playSoundConfig.rollOffMode;
+		if (audioSource.dopplerLevel !== playSoundConfig.dopplerLevel)
+			audioSource.dopplerLevel = playSoundConfig.dopplerLevel;
+		if (playSoundConfig.rolloffCustomCurve) {
+			if (audioSource.rolloffMode !== AudioRolloffMode.Custom) audioSource.rolloffMode = AudioRolloffMode.Custom;
+			audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, playSoundConfig.rolloffCustomCurve);
+		}
+		if (playSoundConfig.mixerGroup) {
+			audioSource.outputAudioMixerGroup = playSoundConfig.mixerGroup;
 		}
 	}
 
