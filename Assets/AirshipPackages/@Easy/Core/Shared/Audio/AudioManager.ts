@@ -197,8 +197,15 @@ export class AudioManager {
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
-				
-				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+				audioSource.volume = config?.volumeScale ?? 1;
+				audioSource.loop = config?.loop ?? false;
+				audioSource.pitch = config?.pitch ?? 1;
+				audioSource.panStereo = config?.panStereo ?? 0;
+				audioSource.minDistance = config?.minDistance ?? 1;
+				audioSource.maxDistance = config?.maxDistance ?? 500;
+				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
+				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
 		this.SetAudioValuesToConfig(audioSource, config);
@@ -265,7 +272,15 @@ export class AudioManager {
 			try {
 				Bridge.SetDefaultAudioSourceValues(audioSource);
 			} catch (err) {
-				warn("AudioManager: Setting default audio source values failed, on an old C# client");
+				audioSource.volume = config?.volumeScale ?? 1;
+				audioSource.loop = config?.loop ?? false;
+				audioSource.pitch = config?.pitch ?? 1;
+				audioSource.panStereo = config?.panStereo ?? 0;
+				audioSource.minDistance = config?.minDistance ?? 1;
+				audioSource.maxDistance = config?.maxDistance ?? 500;
+				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
+				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
 		this.SetAudioValuesToConfig(audioSource, config);
