@@ -205,6 +205,12 @@ export class AudioManager {
 				audioSource.maxDistance = config?.maxDistance ?? 500;
 				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
 				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				if (config?.mixerGroup) {
+					audioSource.outputAudioMixerGroup = config.mixerGroup;
+				}
+				if (config?.rolloffCustomCurve) {
+					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
+				}
 				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
@@ -280,6 +286,12 @@ export class AudioManager {
 				audioSource.maxDistance = config?.maxDistance ?? 500;
 				audioSource.rolloffMode = config?.rollOffMode ?? AudioRolloffMode.Logarithmic;
 				audioSource.dopplerLevel = config?.dopplerLevel ?? 0;
+				if (config?.mixerGroup) {
+					audioSource.outputAudioMixerGroup = config.mixerGroup;
+				}
+				if (config?.rolloffCustomCurve) {
+					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
+				}
 				warn("AudioManager: Setting default audio source values, on an old C# client");
 			}
 		}
