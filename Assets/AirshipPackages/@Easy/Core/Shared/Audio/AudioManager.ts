@@ -371,7 +371,6 @@ export class AudioManager {
 		if (audioSource.dopplerLevel !== playSoundConfig.dopplerLevel)
 			audioSource.dopplerLevel = playSoundConfig.dopplerLevel;
 		if (playSoundConfig.rolloffCustomCurve) {
-			if (audioSource.rolloffMode !== AudioRolloffMode.Custom) audioSource.rolloffMode = AudioRolloffMode.Custom;
 			audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, playSoundConfig.rolloffCustomCurve);
 		}
 		if (playSoundConfig.mixerGroup) {
