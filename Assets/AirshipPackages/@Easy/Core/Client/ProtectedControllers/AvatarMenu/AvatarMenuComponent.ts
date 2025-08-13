@@ -495,6 +495,12 @@ export default class AvatarMenuComponent extends MainMenuPageComponent {
 		const newButton = Object.Instantiate(this.itemButtonTemplate!, this.mainContentHolder!);
 		this.itemButtonBin.AddEngineEventConnection(
 			CanvasAPI.OnClickEvent(newButton, () => {
+				//Make sure we aren't scrolling
+				if (newButton.GetComponent<AirshipRedirectScroll>()?.isDragging) {
+					return;
+				}
+
+				//Fire the buttons call to action
 				task.spawn(() => {
 					onClickCallback();
 				});
