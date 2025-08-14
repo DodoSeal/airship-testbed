@@ -43,7 +43,9 @@ export default class AvatarViewComponent extends AirshipBehaviour {
 	public freeSpinDrag = 3;
 	public cameraTransitionDuration = 1;
 	public screenspaceDistance = 3;
-	public minDragSpeed = 0.15;
+
+	@NonSerialized()
+	public minDragSpeed = 0.01;
 
 	public oddsOfAReaction = 0.25;
 
@@ -115,7 +117,6 @@ export default class AvatarViewComponent extends AirshipBehaviour {
 		}
 		this.bin.Add(
 			OnUpdate.Connect((dt) => {
-
 				if (this.dragging) {
 					const mouseX = Input.GetAxis("Mouse X");
 					let vel = mouseX * this.dragSpeedMod * Time.deltaTime;
