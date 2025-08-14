@@ -16,7 +16,7 @@ import {
 import { Dependency, Service } from "@Easy/Core/Shared/Flamework";
 import { Game } from "@Easy/Core/Shared/Game";
 import { Player } from "@Easy/Core/Shared/Player/Player";
-import { Signal } from "@Easy/Core/Shared/Util/Signal";
+import { Signal, SignalPriority } from "@Easy/Core/Shared/Util/Signal";
 import { AirshipServerManagerService } from "../ServerManager/AirshipServerManagerService";
 
 /**
@@ -42,7 +42,7 @@ export class AirshipTransferService {
 	}
 
 	protected OnStart(): void {
-		Dependency<AirshipServerManagerService>().onShutdown.Connect(() => {
+		Dependency<AirshipServerManagerService>().onShutdown.ConnectWithPriority(SignalPriority.HIGH, () => {
 			this.onShutdown.Fire();
 
 			if (this.transferPlayersOnShutdown) {

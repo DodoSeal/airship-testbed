@@ -84,14 +84,17 @@ export class ShutdownService {
 			this.serverBootstrap.Shutdown();
 		};
 
+		const extraDelaySec = 30;
 		// We allow up to 30 minutes for servers to finish up matches / handle shutdown messages. Set a timer for 30 minutes + 10 seconds to shutdown the server if it isn't already
-		task.unscaledDelay(30 * 60 + 10, () => {
+		task.unscaledDelay(30 * 60 + extraDelaySec, () => {
 			Done();
 		});
 		task.spawn(() => {
 			print("Waiting for contextbridge callback to finish...");
 			contextbridge.invoke("ServerShutdown", LuauContext.Game);
-			print("Contextbridge callback finished, shutting down server...");
+			print(`Contextbridge callback finished, shutting down server in ${extraDelaySec}...`);
+			task.wait(extraDelaySec);
+			print(`Final shutdown delay completed.`);
 			Done();
 		});
 	}
