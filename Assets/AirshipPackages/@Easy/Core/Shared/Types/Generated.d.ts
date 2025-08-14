@@ -51902,6 +51902,7 @@ interface VoxelWorld extends MonoBehaviour {
     FillFlatGround(): void;
     FillRandomTerrain(): void;
     FillSingleBlock(): void;
+    FromBuffer(buffer: buffer): void;
     FullWorldUpdate(): void;
     GenerateWorld(populateTerrain: boolean): void;
     GetChunkByChunkPos(pos: Vector3): Chunk;
@@ -51926,6 +51927,7 @@ interface VoxelWorld extends MonoBehaviour {
     SaveToDomainReloadFile(): void;
     SaveToFile(): void;
     SpawnDebugSphere(pos: Vector3, col: Color, radius: number): GameObject;
+    ToBuffer(): buffer;
     TransformPointToLocalSpace(point: Vector3): Vector3;
     TransformPointToWorldSpace(point: Vector3): Vector3;
     TransformRayToLocalSpace(ray: Ray): Ray;
