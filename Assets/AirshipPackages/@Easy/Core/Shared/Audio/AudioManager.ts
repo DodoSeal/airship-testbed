@@ -210,6 +210,8 @@ export class AudioManager {
 					audioSource.outputAudioMixerGroup = config.mixerGroup;
 				}
 				if (config?.rolloffCustomCurve) {
+					if (audioSource.rolloffMode !== AudioRolloffMode.Custom)
+						audioSource.rolloffMode = AudioRolloffMode.Custom;
 					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
 				}
 			}
@@ -291,6 +293,8 @@ export class AudioManager {
 					audioSource.outputAudioMixerGroup = config.mixerGroup;
 				}
 				if (config?.rolloffCustomCurve) {
+					if (audioSource.rolloffMode !== AudioRolloffMode.Custom)
+						audioSource.rolloffMode = AudioRolloffMode.Custom;
 					audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, config.rolloffCustomCurve);
 				}
 			}
@@ -361,6 +365,9 @@ export class AudioManager {
 			audioSource.dopplerLevel = playSoundConfig.dopplerLevel;
 		}
 		if (playSoundConfig.rolloffCustomCurve) {
+			if (audioSource.rolloffMode !== AudioRolloffMode.Custom) {
+				audioSource.rolloffMode = AudioRolloffMode.Custom;
+			}
 			audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, playSoundConfig.rolloffCustomCurve);
 		}
 		if (playSoundConfig.mixerGroup !== undefined) {
