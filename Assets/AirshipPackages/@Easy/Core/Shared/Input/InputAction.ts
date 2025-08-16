@@ -199,7 +199,7 @@ export class InputAction {
 	 */
 	public GetSerializable(): SerializableAction {
 		return {
-			name: this.name,
+			name: this.internalName,
 			primaryKey: this.binding.config.isKeyBinding ? this.binding.config.key : Key.None,
 			modifierKey: this.binding.config.modifierKey,
 			mouseButton: !this.binding.config.isKeyBinding ? this.binding.config.mouseButton : (-1 as MouseButton),
