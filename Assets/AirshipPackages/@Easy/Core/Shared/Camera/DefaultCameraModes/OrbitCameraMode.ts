@@ -9,7 +9,6 @@ import { CameraConstants, OrbitCameraConfig } from "../CameraConstants";
 import { CameraMode } from "../CameraMode";
 import { CameraTransform } from "../CameraTransform";
 import { OcclusionCameraManager } from "../OcclusionCameraManager";
-import { GetDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const TAU = math.pi * 2;
 
@@ -270,7 +269,7 @@ export class OrbitCameraMode extends CameraMode {
 				moveDelta = this.smoothVector;
 			}
 
-			const mouseSensitivity = GetDpiAdjustedMouseSensitivity();
+			const mouseSensitivity = this.GetDpiAdjustedMouseSensitivity();
 
 			this.rotationY = this.rotationY - mouseDelta.x * mouseSensitivity * CameraConstants.SensitivityScalar;
 			this.rotationX = math.clamp(
