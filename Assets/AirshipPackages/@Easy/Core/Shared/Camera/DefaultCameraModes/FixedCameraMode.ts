@@ -8,7 +8,6 @@ import { Tween } from "../../Tween/Tween";
 import ObjectUtils from "../../Util/ObjectUtils";
 import { CameraConstants, FixedCameraConfig } from "../CameraConstants";
 import { OcclusionCameraManager } from "../OcclusionCameraManager";
-import { GetDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const TAU = math.pi * 2;
 
@@ -226,7 +225,7 @@ export class FixedCameraMode extends CameraMode {
 					moveDelta = this.smoothVector;
 				}
 
-				const mouseSensitivity = GetDpiAdjustedMouseSensitivity();
+				const mouseSensitivity = this.GetDpiAdjustedMouseSensitivity();
 
 				// Using Screen.width for both X and Y sensitivity (feels wrong having different vertical & horizontal sens)
 				this.rotationY = this.rotationY - moveDelta.x * mouseSensitivity * CameraConstants.SensitivityScalar;
