@@ -7,7 +7,7 @@ import { Spring } from "@Easy/Core/Shared/Util/Spring";
 import { Airship } from "../../Airship";
 import { CameraMode } from "../CameraMode";
 import { CameraTransform } from "../CameraTransform";
-import { getDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
+import { GetDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const SPEED = 12;
 
@@ -144,7 +144,7 @@ export class FlyCameraMode extends CameraMode {
 		if (rightClick) {
 			const sensFovScalar = MathUtil.Map(this.currentFov, MIN_FOV, MAX_FOV, 0.2, 1);
 			const mouseDelta = Mouse.GetDelta();
-			const sensitivity = getDpiAdjustedMouseSensitivity() * sensFovScalar;
+			const sensitivity = GetDpiAdjustedMouseSensitivity() * sensFovScalar;
 			this.xRotSpring.goal = new Vector3(
 				math.clamp(this.xRotSpring.goal.x + mouseDelta.y * sensitivity, MIN_ROT_X, MAX_ROT_X),
 				0,
