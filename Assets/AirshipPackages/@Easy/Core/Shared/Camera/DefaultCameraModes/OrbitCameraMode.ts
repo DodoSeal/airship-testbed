@@ -9,6 +9,7 @@ import { CameraConstants, OrbitCameraConfig } from "../CameraConstants";
 import { CameraMode } from "../CameraMode";
 import { CameraTransform } from "../CameraTransform";
 import { OcclusionCameraManager } from "../OcclusionCameraManager";
+import { getDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const TAU = math.pi * 2;
 
@@ -269,17 +270,18 @@ export class OrbitCameraMode extends CameraMode {
 				moveDelta = this.smoothVector;
 			}
 
-			const mouseSensitivity = Airship.Input.GetMouseSensitivity();
+			const mouseSensitivity = getDpiAdjustedMouseSensitivity();
 
-			this.rotationY =
-				(this.rotationY -
-					(mouseDelta.x / Screen.width) * mouseSensitivity * CameraConstants.SensitivityScalar) %
-				(math.pi * 2);
+			this.rotationY = this.rotationY - mouseDelta.x * mouseSensitivity * CameraConstants.SensitivityScalar;
 			this.rotationX = math.clamp(
-				this.rotationX + (moveDelta.y / Screen.width) * mouseSensitivity * CameraConstants.SensitivityScalar,
+				this.rotationX + moveDelta.y * mouseSensitivity * CameraConstants.SensitivityScalar,
 				this.minRotX,
 				this.maxRotX,
 			);
+
+			if (this.rotationY < 0 || this.rotationY > math.pi * 2) {
+				this.rotationY %= math.pi * 2;
+			}
 		}
 
 		// Update mouse locked state. This will make the next frame's delta be 0.

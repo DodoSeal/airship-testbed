@@ -7,6 +7,7 @@ import { Spring } from "@Easy/Core/Shared/Util/Spring";
 import { Airship } from "../../Airship";
 import { CameraMode } from "../CameraMode";
 import { CameraTransform } from "../CameraTransform";
+import { getDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const SPEED = 12;
 
@@ -18,14 +19,6 @@ const MAX_FOV = 120;
 const START_FOV = 70;
 
 const FOV_SCROLL_SENSITIVITY = 2;
-
-let MOUSE_SENS_SCALAR = 0.02;
-if (Game.IsMac()) {
-	MOUSE_SENS_SCALAR *= 5;
-}
-if (!Game.IsEditor()) {
-	MOUSE_SENS_SCALAR *= 0.15;
-}
 
 export class FlyCameraMode extends CameraMode {
 	GetFriendlyName(): string {
@@ -151,7 +144,7 @@ export class FlyCameraMode extends CameraMode {
 		if (rightClick) {
 			const sensFovScalar = MathUtil.Map(this.currentFov, MIN_FOV, MAX_FOV, 0.2, 1);
 			const mouseDelta = Mouse.GetDelta();
-			const sensitivity = Airship.Input.GetMouseSensitivity() * MOUSE_SENS_SCALAR * sensFovScalar;
+			const sensitivity = getDpiAdjustedMouseSensitivity() * sensFovScalar;
 			this.xRotSpring.goal = new Vector3(
 				math.clamp(this.xRotSpring.goal.x + mouseDelta.y * sensitivity, MIN_ROT_X, MAX_ROT_X),
 				0,
@@ -162,7 +155,11 @@ export class FlyCameraMode extends CameraMode {
 			this.yRotVelSpring.goal = new Vector3(0, 0, 0);
 		}
 		this.rotationX = this.xRotSpring.Update(dt).x;
-		this.rotationY = (this.rotationY + this.yRotVelSpring.Update(dt).y) % (math.pi * 2);
+		this.rotationY = this.rotationY + this.yRotVelSpring.Update(dt).y;
+
+		if (this.rotationY < 0 || this.rotationY > math.pi * 2) {
+			this.rotationY %= math.pi * 2;
+		}
 	}
 
 	OnPostUpdate() {}

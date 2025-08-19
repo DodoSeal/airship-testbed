@@ -8,6 +8,7 @@ import { Tween } from "../../Tween/Tween";
 import ObjectUtils from "../../Util/ObjectUtils";
 import { CameraConstants, FixedCameraConfig } from "../CameraConstants";
 import { OcclusionCameraManager } from "../OcclusionCameraManager";
+import { getDpiAdjustedMouseSensitivity } from "../CameraSensitivity";
 
 const TAU = math.pi * 2;
 
@@ -225,19 +226,19 @@ export class FixedCameraMode extends CameraMode {
 					moveDelta = this.smoothVector;
 				}
 
-				const mouseSensitivity = Airship.Input.GetMouseSensitivity();
+				const mouseSensitivity = getDpiAdjustedMouseSensitivity();
 
 				// Using Screen.width for both X and Y sensitivity (feels wrong having different vertical & horizontal sens)
-				this.rotationY =
-					(this.rotationY -
-						(moveDelta.x / Screen.width) * mouseSensitivity * CameraConstants.SensitivityScalar) %
-					TAU;
+				this.rotationY = this.rotationY - moveDelta.x * mouseSensitivity * CameraConstants.SensitivityScalar;
 				this.rotationX = math.clamp(
-					this.rotationX +
-						(moveDelta.y / Screen.width) * mouseSensitivity * CameraConstants.SensitivityScalar,
+					this.rotationX + moveDelta.y * mouseSensitivity * CameraConstants.SensitivityScalar,
 					this.minRotX,
 					this.maxRotX,
 				);
+
+				if (this.rotationY < 0 || this.rotationY > math.pi * 2) {
+					this.rotationY %= math.pi * 2;
+				}
 			}
 
 			// Update mouse locked state. This will make the next frame's delta be 0.
