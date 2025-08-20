@@ -152,4 +152,32 @@ export class Binding {
 		}
 		return result;
 	}
+
+	/**
+	 * Gets the sprites for the binding
+	 *
+	 * @returns Sprites for the binding.
+	 */
+	public GetSprites(): Sprite[] | undefined {
+		if (this.IsUnset()) return undefined;
+
+		const key = this.GetKey();
+		let result: Sprite[] = [];
+		if (key !== undefined) {
+			const sprite = InputUtils.GetSpriteForKeyCode(key);
+			if (sprite) result.push(sprite);
+		}
+		const mouseButton = this.GetMouseButton();
+		if (mouseButton !== undefined) {
+			const sprite = InputUtils.GetSpriteForMouseButton(mouseButton);
+			if (sprite) result.push(sprite);
+		}
+
+		const modifierKey = this.GetModifierAsKey();
+		if (modifierKey !== undefined && modifierKey !== Key.None) {
+			const sprite = InputUtils.GetSpriteForKeyCode(modifierKey);
+			if (sprite) result.push(sprite);
+		}
+		return result;
+	}
 }
