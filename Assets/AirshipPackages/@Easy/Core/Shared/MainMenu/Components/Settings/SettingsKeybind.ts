@@ -150,16 +150,20 @@ export default class SettingsKeybind extends AirshipBehaviour {
 		this.title.text = action.GetDisplayName();
 		this.UpdateBindingTextAndImageFromBinding(action.binding);
 
-		Airship.Input.onActionUnbound.Connect((unbound) => {
-			if (unbound !== action) return;
-			this.UpdateBindingTextAndImageFromBinding(unbound.binding);
-			this.HighlightValueImage();
-		});
+		this.bin.Add(
+			Airship.Input.onActionUnbound.Connect((unbound) => {
+				if (unbound !== action) return;
+				this.UpdateBindingTextAndImageFromBinding(unbound.binding);
+				this.HighlightValueImage();
+			}),
+		);
 
-		Airship.Input.onActionBound.Connect((bound) => {
-			if (bound !== action) return;
-			this.UpdateBindingTextAndImageFromBinding(bound.binding);
-		});
+		this.bin.Add(
+			Airship.Input.onActionBound.Connect((bound) => {
+				if (bound !== action) return;
+				this.UpdateBindingTextAndImageFromBinding(bound.binding);
+			}),
+		);
 
 		this.SetListening(false);
 		this.StartKeyListener();
