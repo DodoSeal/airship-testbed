@@ -73,6 +73,8 @@ export class ProtectedFriendsController {
 		(username: string, userId: string, result: boolean, extraData: unknown) => void
 	>();
 
+	public statusUpdateContinuationThread: thread | undefined;
+
 	constructor(
 		private readonly authController: AuthController,
 		private readonly socketController: SocketController,
@@ -366,12 +368,34 @@ export class ProtectedFriendsController {
 		return this.statusText;
 	}
 
+	private CancelActiveStatusUpdateContinuationThread() {
+		if (
+			this.statusUpdateContinuationThread !== undefined &&
+			coroutine.status(this.statusUpdateContinuationThread) !== "dead"
+		) {
+			task.cancel(this.statusUpdateContinuationThread);
+			this.statusUpdateContinuationThread = undefined;
+		}
+	}
+
+	private CreateNewStatusUpdateContinuationThread(delay: number) {
+		// check again to ensure the last set continuation thread sets the delay
+		// alongside async boundaries
+		this.CancelActiveStatusUpdateContinuationThread();
+		this.statusUpdateContinuationThread = task.delay(delay, () => {
+			this.statusUpdateContinuationThread = undefined;
+			this.SendStatusUpdateYielding();
+		});
+	}
+
 	public SendStatusUpdateYielding(): void {
 		Game.WaitForLocalPlayerLoaded();
 
 		if (Game.IsEditor() && !Game.IsInternal()) {
 			return;
 		}
+
+		this.CancelActiveStatusUpdateContinuationThread();
 
 		const status: AirshipUpdateStatusDto = {
 			status: Game.coreContext === CoreContext.GAME ? "in_game" : "online",
@@ -382,8 +406,19 @@ export class ProtectedFriendsController {
 				customGameTitle: Game.gameData?.name,
 			},
 		};
-		// CoreLogger.Log("send status update: " + json.encode(status));
-		client.userStatus.updateUserStatus(status).expect();
+
+		try {
+			// CoreLogger.Log("send status update: " + json.encode(status));
+			const result = client.userStatus.updateUserStatus(status).expect();
+
+			if (result.refreshIn !== undefined) {
+				this.CreateNewStatusUpdateContinuationThread(result.refreshIn);
+			}
+		} catch (err) {
+			CoreLogger.Error("Failed to refresh status. Trying again in 1 minute.");
+			this.CreateNewStatusUpdateContinuationThread(60);
+			return;
+		}
 	}
 
 	public FetchFriends(): void {
