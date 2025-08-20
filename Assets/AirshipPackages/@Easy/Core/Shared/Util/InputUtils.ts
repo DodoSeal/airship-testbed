@@ -157,11 +157,21 @@ export class InputUtils {
 		return this.mouseButtonMap[mouseButton];
 	}
 
-	public static GetSpriteForKeyCode(key: Key): Sprite | undefined {
-		return Asset.LoadAssetIfExists<Sprite>(this.keyCodeSpritePathMap[key]);
+	public static GetSpriteForKeyCode(key: Key, getOutlineVersion?: boolean): Sprite | undefined {
+		let path = this.keyCodeSpritePathMap[key];
+		if (getOutlineVersion) {
+			const splitStringArray = string.split(path, ".");
+			path = splitStringArray[0] + "_outline.png.sprite";
+		}
+		return Asset.LoadAssetIfExists<Sprite>(path);
 	}
 
-	public static GetSpriteForMouseButton(mouseButton: MouseButton): Sprite | undefined {
-		return Asset.LoadAssetIfExists<Sprite>(this.mouseButtonSpritePathMap[mouseButton]);
+	public static GetSpriteForMouseButton(mouseButton: MouseButton, getOutlineVersion?: boolean): Sprite | undefined {
+		let path = this.mouseButtonSpritePathMap[mouseButton];
+		if (getOutlineVersion) {
+			const splitStringArray = string.split(path, ".");
+			path = splitStringArray[0] + "_outline.png.sprite";
+		}
+		return Asset.LoadAssetIfExists<Sprite>(path);
 	}
 }

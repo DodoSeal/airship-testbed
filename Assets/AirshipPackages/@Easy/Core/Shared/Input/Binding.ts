@@ -158,13 +158,13 @@ export class Binding {
 	 *
 	 * @returns Sprites for the binding.
 	 */
-	public GetSprites(): Sprite[] | undefined {
+	public GetSprites(getOutlineVersion?: boolean): Sprite[] | undefined {
 		if (this.IsUnset()) return undefined;
 
 		const key = this.GetKey();
 		let result: Sprite[] = [];
 		if (key !== undefined) {
-			const sprite = InputUtils.GetSpriteForKeyCode(key);
+			const sprite = InputUtils.GetSpriteForKeyCode(key, getOutlineVersion);
 			if (sprite) result.push(sprite);
 		}
 		const mouseButton = this.GetMouseButton();
@@ -175,7 +175,7 @@ export class Binding {
 
 		const modifierKey = this.GetModifierAsKey();
 		if (modifierKey !== undefined && modifierKey !== Key.None) {
-			const sprite = InputUtils.GetSpriteForKeyCode(modifierKey);
+			const sprite = InputUtils.GetSpriteForKeyCode(modifierKey, getOutlineVersion);
 			if (sprite) result.push(sprite);
 		}
 		return result;
