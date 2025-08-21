@@ -1,6 +1,9 @@
+import { Airship } from "../Airship";
 import Character from "../Character/Character";
 import { Signal } from "../Util/Signal";
 import { CameraTransform } from "./CameraTransform";
+
+const BASE_DPI = 96;
 
 /**
  * Represents a camera mode's target.
@@ -95,6 +98,17 @@ export abstract class CameraMode {
 	 */
 	public GetCharacterTarget(): Character | undefined {
 		return this.character;
+	}
+
+	protected GetDpiAdjustedMouseSensitivity(): number {
+		const dpi = Screen.dpi;
+
+		// If Unity cannot determine DPI, it will be zero
+		if (dpi === 0) {
+			return Airship.Input.GetMouseSensitivity();
+		}
+
+		return Airship.Input.GetMouseSensitivity() * (dpi / BASE_DPI);
 	}
 
 	/** Called when the camera mode is enabled. */

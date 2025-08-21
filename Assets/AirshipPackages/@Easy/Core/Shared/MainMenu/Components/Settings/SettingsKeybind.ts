@@ -27,6 +27,10 @@ export default class SettingsKeybind extends AirshipBehaviour {
 	public valueImageBG!: Image;
 	public overlay!: GameObject;
 
+	public keybindImage: Image;
+	public modifierPlusImage: Image;
+	public modifierKeybindImage: Image;
+
 	private inputAction: InputAction | undefined;
 
 	private isListening = false;
@@ -144,18 +148,22 @@ export default class SettingsKeybind extends AirshipBehaviour {
 	public Init(action: InputAction) {
 		this.inputAction = action;
 		this.title.text = action.GetDisplayName();
-		this.UpdateBindingTextFromBinding(action.binding);
+		this.UpdateBindingTextAndImageFromBinding(action.binding);
 
-		Airship.Input.onActionUnbound.Connect((unbound) => {
-			if (unbound !== action) return;
-			this.UpdateBindingTextFromBinding(unbound.binding);
-			this.HighlightValueImage();
-		});
+		this.bin.Add(
+			Airship.Input.onActionUnbound.Connect((unbound) => {
+				if (unbound !== action) return;
+				this.UpdateBindingTextAndImageFromBinding(unbound.binding);
+				this.HighlightValueImage();
+			}),
+		);
 
-		Airship.Input.onActionBound.Connect((bound) => {
-			if (bound !== action) return;
-			this.UpdateBindingTextFromBinding(bound.binding);
-		});
+		this.bin.Add(
+			Airship.Input.onActionBound.Connect((bound) => {
+				if (bound !== action) return;
+				this.UpdateBindingTextAndImageFromBinding(bound.binding);
+			}),
+		);
 
 		this.SetListening(false);
 		this.StartKeyListener();
@@ -240,12 +248,18 @@ export default class SettingsKeybind extends AirshipBehaviour {
 	 *
 	 * @param keyCode
 	 */
-	private UpdateBindingTextFromBinding(binding: Binding): void {
+	private UpdateBindingTextAndImageFromBinding(binding: Binding): void {
 		if (binding.config.isKeyBinding) {
+			const sprite = InputUtils.GetSpriteForKeyCode(binding.config.key);
+			if (sprite) this.keybindImage.sprite = sprite;
+
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
 					InputUtils.GetStringForKeyCode(binding.config.key) ?? `Unknown(${binding.config.key})`;
 				this.UpdateKeybindText(bindingText);
+
+				this.modifierKeybindImage.gameObject.SetActive(false);
+				this.modifierPlusImage.gameObject.SetActive(false);
 			} else {
 				const primaryKeyCodeText =
 					InputUtils.GetStringForKeyCode(binding.config.key) ?? `Unknown(${binding.config.key})`;
@@ -255,13 +269,24 @@ export default class SettingsKeybind extends AirshipBehaviour {
 				const bindingText = `${modifierKeyCodeText} + ${primaryKeyCodeText}`;
 
 				this.UpdateKeybindText(bindingText);
+
+				this.modifierPlusImage.gameObject.SetActive(true);
+				this.modifierKeybindImage.gameObject.SetActive(true);
+				const sprite = InputUtils.GetSpriteForKeyCode(modifierAsKeyCode);
+				if (sprite) this.modifierKeybindImage.sprite = sprite;
 			}
 		} else {
+			const sprite = InputUtils.GetSpriteForMouseButton(binding.config.mouseButton);
+			if (sprite) this.keybindImage.sprite = sprite;
+
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
 					InputUtils.GetStringForMouseButton(binding.config.mouseButton) ??
 					`Unknown(${binding.config.mouseButton})`;
 				this.UpdateKeybindText(bindingText);
+
+				this.modifierKeybindImage.gameObject.SetActive(false);
+				this.modifierPlusImage.gameObject.SetActive(false);
 			} else {
 				const primaryKeyCodeText =
 					InputUtils.GetStringForMouseButton(binding.config.mouseButton) ??
@@ -271,6 +296,11 @@ export default class SettingsKeybind extends AirshipBehaviour {
 					InputUtils.GetStringForKeyCode(modifierAsKeyCode) ?? `Unknown(${modifierAsKeyCode})`;
 				const bindingText = `${modifierKeyCodeText} + ${primaryKeyCodeText}`;
 				this.UpdateKeybindText(bindingText);
+
+				this.modifierPlusImage.gameObject.SetActive(true);
+				this.modifierKeybindImage.gameObject.SetActive(true);
+				const sprite = InputUtils.GetSpriteForKeyCode(modifierAsKeyCode);
+				if (sprite) this.modifierKeybindImage.sprite = sprite;
 			}
 		}
 	}
