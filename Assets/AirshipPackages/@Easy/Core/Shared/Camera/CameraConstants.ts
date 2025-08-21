@@ -78,7 +78,7 @@ export class CameraConstants {
 	/**
 	 * Raw camera sensitivity multiplier.
 	 */
-	public static SensitivityScalar = 15;
+	public static SensitivityScalar = 0.02;
 	public static ArrowKeySensitivityScalar = 3.75;
 
 	/**
