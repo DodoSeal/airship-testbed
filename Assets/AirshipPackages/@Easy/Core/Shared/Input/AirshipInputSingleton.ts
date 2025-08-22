@@ -1207,7 +1207,9 @@ export class AirshipInputSingleton {
 			const clientSettings = Protected.Settings.WaitForSettingsLoaded().expect();
 			const gameOverrides = clientSettings.gameKeybindOverrides[gameId];
 			if (!gameOverrides) return;
-			const actionOverride = gameOverrides[action.internalName];
+			// Checking by key `action.name` here for backwards compat. Old rebinds could have case sensitive
+			// entries in ClientSettings.
+			const actionOverride = gameOverrides[action.internalName] ?? gameOverrides[action.name];
 			if (!actionOverride) return;
 			const bindingFromSettings = this.CreateBindingFromSerializedAction(actionOverride);
 			action.UpdateBinding(bindingFromSettings);
