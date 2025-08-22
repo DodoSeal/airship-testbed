@@ -251,7 +251,12 @@ export default class SettingsKeybind extends AirshipBehaviour {
 	private UpdateBindingTextAndImageFromBinding(binding: Binding): void {
 		if (binding.config.isKeyBinding) {
 			const sprite = InputUtils.GetSpriteForKeyCode(binding.config.key);
-			if (sprite) this.keybindImage.sprite = sprite;
+			if (sprite) {
+				this.keybindImage.gameObject.SetActive(true);
+				this.keybindImage.sprite = sprite;
+			} else {
+				this.keybindImage.gameObject.SetActive(false);
+			}
 
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
@@ -277,7 +282,12 @@ export default class SettingsKeybind extends AirshipBehaviour {
 			}
 		} else {
 			const sprite = InputUtils.GetSpriteForMouseButton(binding.config.mouseButton);
-			if (sprite) this.keybindImage.sprite = sprite;
+			if (sprite) {
+				this.keybindImage.gameObject.SetActive(true);
+				this.keybindImage.sprite = sprite;
+			} else {
+				this.keybindImage.gameObject.SetActive(false);
+			}
 
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
