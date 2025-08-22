@@ -32,7 +32,7 @@ export class InputUtils {
 		[Key.Y]: "Y",
 		[Key.Z]: "Z",
 
-		/// Numeric names
+		// Numeric names
 		[Key.Digit1]: "1",
 		[Key.Digit2]: "2",
 		[Key.Digit3]: "3",
@@ -44,8 +44,13 @@ export class InputUtils {
 		[Key.Digit9]: "9",
 		[Key.Digit0]: "0",
 
-		// Symbolic names
+		// Arrow keys
+		[Key.RightArrow]: "Right Arrow",
+		[Key.LeftArrow]: "Left Arrow",
+		[Key.UpArrow]: "Up Arrow",
+		[Key.DownArrow]: "Down Arrow",
 
+		// Symbolic names
 		[Key.Backquote]: "`",
 		[Key.Minus]: "-",
 		[Key.Equals]: "=",
