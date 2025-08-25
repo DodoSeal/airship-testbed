@@ -116,6 +116,11 @@ export class InputUtils {
 		[Key.Digit9]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_9.png.sprite",
 		[Key.Digit0]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_0.png.sprite",
 
+		[Key.RightArrow]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_arrow_right.png.sprite",
+		[Key.LeftArrow]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_arrow_left.png.sprite",
+		[Key.UpArrow]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_arrow_up.png.sprite",
+		[Key.DownArrow]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_arrow_down.png.sprite",
+
 		[Key.Backquote]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_apostrophe.png.sprite", // fixme
 		[Key.Minus]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_minus.png.sprite",
 		[Key.Equals]: "Assets/AirshipPackages/@Easy/Core/Prefabs/UI/InputIcons/keyboard_equals.png.sprite",
@@ -163,20 +168,26 @@ export class InputUtils {
 	}
 
 	public static GetSpriteForKeyCode(key: Key, getOutlineVersion?: boolean): Sprite | undefined {
-		let path = this.keyCodeSpritePathMap[key];
+		let path = this.keyCodeSpritePathMap[key] ?? "";
 		if (getOutlineVersion) {
 			const splitStringArray = string.split(path, ".");
 			path = splitStringArray[0] + "_outline.png.sprite";
 		}
-		return Asset.LoadAssetIfExists<Sprite>(path);
+		if (path) {
+			return Asset.LoadAssetIfExists<Sprite>(path);
+		}
+		return undefined;
 	}
 
 	public static GetSpriteForMouseButton(mouseButton: MouseButton, getOutlineVersion?: boolean): Sprite | undefined {
-		let path = this.mouseButtonSpritePathMap[mouseButton];
+		let path = this.mouseButtonSpritePathMap[mouseButton] ?? "";
 		if (getOutlineVersion) {
 			const splitStringArray = string.split(path, ".");
 			path = splitStringArray[0] + "_outline.png.sprite";
 		}
-		return Asset.LoadAssetIfExists<Sprite>(path);
+		if (path) {
+			return Asset.LoadAssetIfExists<Sprite>(path);
+		}
+		return undefined;
 	}
 }

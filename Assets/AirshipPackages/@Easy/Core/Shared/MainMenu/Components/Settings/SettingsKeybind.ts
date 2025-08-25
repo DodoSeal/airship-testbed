@@ -114,6 +114,17 @@ export default class SettingsKeybind extends AirshipBehaviour {
 
 	public ResetToDefault(): void {
 		this.inputAction?.ResetBinding();
+
+		// Let's be absolutely sure that we're updating the Protected
+		// instance of this keybind.
+		if (this.inputAction?.context === InputActionContext.Protected && Game.IsProtectedLuauContext()) {
+			Airship.Input.BroadcastProtectedKeybindUpdate(this.inputAction);
+			if (this.inputAction.isCore) {
+				Airship.Input.SerializeCoreKeybinds();
+			} else {
+				Airship.Input.SerializeGameKeybind(this.inputAction);
+			}
+		}
 	}
 
 	/**
@@ -251,7 +262,12 @@ export default class SettingsKeybind extends AirshipBehaviour {
 	private UpdateBindingTextAndImageFromBinding(binding: Binding): void {
 		if (binding.config.isKeyBinding) {
 			const sprite = InputUtils.GetSpriteForKeyCode(binding.config.key);
-			if (sprite) this.keybindImage.sprite = sprite;
+			if (sprite) {
+				this.keybindImage.gameObject.SetActive(true);
+				this.keybindImage.sprite = sprite;
+			} else {
+				this.keybindImage.gameObject.SetActive(false);
+			}
 
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
@@ -277,7 +293,12 @@ export default class SettingsKeybind extends AirshipBehaviour {
 			}
 		} else {
 			const sprite = InputUtils.GetSpriteForMouseButton(binding.config.mouseButton);
-			if (sprite) this.keybindImage.sprite = sprite;
+			if (sprite) {
+				this.keybindImage.gameObject.SetActive(true);
+				this.keybindImage.sprite = sprite;
+			} else {
+				this.keybindImage.gameObject.SetActive(false);
+			}
 
 			if (!binding.IsComplexBinding()) {
 				const bindingText =
