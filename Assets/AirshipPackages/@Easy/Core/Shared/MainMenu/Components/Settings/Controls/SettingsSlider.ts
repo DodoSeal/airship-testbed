@@ -17,19 +17,19 @@ export default class SettingsSlider extends AirshipBehaviour {
 	public Init(name: string, startingValue: number, min: number, max: number): void {
 		this.titleText.text = name;
 
+		if (name === "Testing") print(`Debug: Create ${name} Slider -`, startingValue);
 		const slider = this.slider.GetComponent<Slider>()!;
+		let ignoreNextSliderChange = false;
+		// let ignoreNextInputFieldChange = false;
 
 		let valRounded = math.floor(startingValue * 100) / 100;
-		slider.value = valRounded;
-		this.inputField.text = string.format("%.2f", valRounded);
 
 		slider.maxValue = max;
 		slider.minValue = min;
+		slider.value = valRounded;
+		this.inputField.text = string.format("%.2f", valRounded);
 
-		let ignoreNextSliderChange = false;
-		let ignoreNextInputFieldChange = false;
-
-		this.bin.AddEngineEventConnection(
+		/* this.bin.AddEngineEventConnection(
 			CanvasAPI.OnValueChangeEvent(this.inputField.gameObject, () => {
 				if (ignoreNextInputFieldChange) {
 					ignoreNextInputFieldChange = false;
@@ -43,7 +43,7 @@ export default class SettingsSlider extends AirshipBehaviour {
 				this.onChange.Fire(value);
 				slider.value = value;
 			}),
-		);
+		); */
 
 		this.bin.AddEngineEventConnection(
 			CanvasAPI.OnValueChangeEvent(this.slider, (value) => {
@@ -52,9 +52,9 @@ export default class SettingsSlider extends AirshipBehaviour {
 					return;
 				}
 
-				ignoreNextInputFieldChange = true;
+				// ignoreNextInputFieldChange = true;
 				this.onChange.Fire(value);
-				this.inputField.text = math.floor(value * 100) / 100 + "";
+				this.inputField.text = `${math.floor(value * 100) / 100}`;
 			}),
 		);
 
