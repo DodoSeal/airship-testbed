@@ -17,7 +17,6 @@ export default class SettingsSlider extends AirshipBehaviour {
 	public Init(name: string, startingValue: number, min: number, max: number): void {
 		this.titleText.text = name;
 
-		if (name === "Testing") print(`Debug: Create ${name} Slider -`, startingValue);
 		const slider = this.slider.GetComponent<Slider>()!;
 		let ignoreNextSliderChange = false;
 		// let ignoreNextInputFieldChange = false;
