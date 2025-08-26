@@ -19,7 +19,6 @@ export default class SettingsSlider extends AirshipBehaviour {
 
 		const slider = this.slider.GetComponent<Slider>()!;
 		let ignoreNextSliderChange = false;
-		// let ignoreNextInputFieldChange = false;
 
 		let valRounded = math.floor(startingValue * 100) / 100;
 
@@ -28,30 +27,13 @@ export default class SettingsSlider extends AirshipBehaviour {
 		slider.value = valRounded;
 		this.inputField.text = string.format("%.2f", valRounded);
 
-		/* this.bin.AddEngineEventConnection(
-			CanvasAPI.OnValueChangeEvent(this.inputField.gameObject, () => {
-				if (ignoreNextInputFieldChange) {
-					ignoreNextInputFieldChange = false;
-					return;
-				}
-
-				const value = tonumber(this.inputField.text);
-				if (value === undefined) return;
-
-				ignoreNextSliderChange = true;
-				this.onChange.Fire(value);
-				slider.value = value;
-			}),
-		); */
-
 		this.bin.AddEngineEventConnection(
 			CanvasAPI.OnValueChangeEvent(this.slider, (value) => {
 				if (ignoreNextSliderChange) {
 					ignoreNextSliderChange = false;
 					return;
-				}
+				};
 
-				// ignoreNextInputFieldChange = true;
 				this.onChange.Fire(value);
 				this.inputField.text = `${math.floor(value * 100) / 100}`;
 			}),
