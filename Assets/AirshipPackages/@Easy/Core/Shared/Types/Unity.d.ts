@@ -307,6 +307,12 @@ interface Vector3 {
 	WithY(y: number): Vector3;
 	/** Returns vector with provided z value */
 	WithZ(z: number): Vector3;
+
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual(other: Vector3, epsilon?: number): boolean;
 }
 
 interface Vector3Constructor {
@@ -412,6 +418,12 @@ interface Vector3Constructor {
 		maxSpeed?: number,
 	) => LuaTuple<[newCurrent: Vector3, newVelocity: Vector3]>;
 
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual: (a: Vector3, b: Vector3, epsilon?: number) => boolean;
+
 	/** Constructs a new Vector3 using the given x, y, and z components. */
 	new (x: number, y: number, z: number): Vector3;
 
@@ -467,6 +479,12 @@ interface Vector4 {
 
 	/** Calculates the distance between two vectors. */
 	Distance(to: Vector4): number;
+
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual(other: Vector4, epsilon?: number): boolean;
 }
 
 interface Vector4Constructor {
@@ -505,6 +523,12 @@ interface Vector4Constructor {
 
 	/** Calculates the distance between two vectors. */
 	Distance: (from: Vector4, to: Vector4) => number;
+
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual: (a: Vector4, b: Vector4, epsilon?: number) => boolean;
 
 	/** Constructs a new Vector4 using the given x, y, z, and w components. */
 	new (x: number, y: number, z: number, w: number): Vector4;
@@ -571,6 +595,12 @@ interface Vector2 {
 
 	/** Returns the vector moved towards `target` a maximum of `maxDistanceDelta`. */
 	MoveTowards(target: Vector2, maxDistanceDelta: number): Vector2;
+
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual(other: Vector2, epsilon?: number): boolean;
 }
 
 interface Vector2Constructor {
@@ -633,6 +663,12 @@ interface Vector2Constructor {
 
 	/** Returns a vector moved from `current` towards `target` a maximum of `maxDistanceDelta`. */
 	MoveTowards: (current: Vector2, target: Vector2, maxDistanceDelta: number) => Vector2;
+
+	/**
+	 * Check if the two vectors are approximately equal, using `epsilon` as
+	 * the threshold. The default epsilon value is `0.00001`.
+	 */
+	ApproxEqual: (a: Vector2, b: Vector2, epsilon?: number) => boolean;
 
 	new (x: number, y: number): Vector2;
 	new (): Vector2;
