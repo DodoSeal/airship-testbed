@@ -288,6 +288,7 @@ export class ProtectedSettingsSingleton {
 
 		// Microphone
 		task.spawn(() => {
+			if (Game.IsMobile()) return;
 			if (!this.data.microphoneEnabled) {
 				return;
 			}
