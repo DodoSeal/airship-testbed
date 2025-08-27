@@ -192,11 +192,13 @@ export class MessagingService {
 			}
 		});
 
-		SetInterval(30, () => {
-			if (Game.IsEditor()) return; // Disabled in editor since agones is not running.
-			AgonesCore.Agones.SetAnnotation("MessagingCustomSent", `${this.customMessagesSent}`);
-			AgonesCore.Agones.SetAnnotation("MessagingCustomReceived", `${this.customMessagesReceived}`);
-		});
+		// Disabled in editor since agones is not running.
+		if (!Game.IsEditor()) {
+			SetInterval(30, () => {
+				AgonesCore.Agones.SetAnnotation("MessagingCustomSent", `${this.customMessagesSent}`);
+				AgonesCore.Agones.SetAnnotation("MessagingCustomReceived", `${this.customMessagesReceived}`);
+			});
+		}
 
 		task.defer(() => {
 			this.Connect();
