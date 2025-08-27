@@ -14,20 +14,20 @@ export default class SettingsSlider extends AirshipBehaviour {
 
 	override Start(): void {}
 
-	public Init(name: string, startingValue: number, min: number, max: number): void {
+	public Init(name: string, startingValue: number, min: number, max: number, increment: number = 1): void {
 		this.titleText.text = name;
 
 		const slider = this.slider.GetComponent<Slider>()!;
+		let ignoreNextSliderChange = false;
+		let ignoreNextInputFieldChange = false;
 
-		let valRounded = math.floor(startingValue * 100) / 100;
-		slider.value = valRounded;
-		this.inputField.text = string.format("%.2f", valRounded);
+		let valRounded = this.ValidateIncrement(math.floor(startingValue * 100) / 100, increment);
+		let textValue = string.format("%.2f", valRounded);
 
 		slider.maxValue = max;
 		slider.minValue = min;
-
-		let ignoreNextSliderChange = false;
-		let ignoreNextInputFieldChange = false;
+		slider.value = valRounded;
+		this.inputField.text = textValue;
 
 		this.bin.AddEngineEventConnection(
 			CanvasAPI.OnValueChangeEvent(this.inputField.gameObject, () => {
@@ -35,26 +35,27 @@ export default class SettingsSlider extends AirshipBehaviour {
 					ignoreNextInputFieldChange = false;
 					return;
 				}
-
 				const value = tonumber(this.inputField.text);
 				if (value === undefined) return;
+				let newValue = this.ValidateIncrement(math.floor(value * 100) / 100, increment);
 
 				ignoreNextSliderChange = true;
 				this.onChange.Fire(value);
-				slider.value = value;
+				slider.value = newValue;
 			}),
 		);
 
 		this.bin.AddEngineEventConnection(
 			CanvasAPI.OnValueChangeEvent(this.slider, (value) => {
+				let newValue = this.ValidateIncrement(math.floor(value * 100) / 100, increment);
+
 				if (ignoreNextSliderChange) {
 					ignoreNextSliderChange = false;
 					return;
-				}
+				};
 
-				ignoreNextInputFieldChange = true;
-				this.onChange.Fire(value);
-				this.inputField.text = math.floor(value * 100) / 100 + "";
+				this.onChange.Fire(newValue);
+				this.inputField.text = `${math.floor(newValue * 100) / 100}`;
 			}),
 		);
 
@@ -70,6 +71,10 @@ export default class SettingsSlider extends AirshipBehaviour {
 	private PlaySelectSound() {
 		AudioManager.PlayGlobal("AirshipPackages/@Easy/Core/Sound/UI_Select.wav");
 	}
+
+	private ValidateIncrement(value: number, increment: number): number {
+		return math.round((value / increment)) * increment;
+	};
 
 	override OnDestroy(): void {
 		this.bin.Clean();

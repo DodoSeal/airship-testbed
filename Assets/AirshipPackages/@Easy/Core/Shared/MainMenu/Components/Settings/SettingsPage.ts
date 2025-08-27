@@ -145,7 +145,7 @@ export default class SettingsPage extends AirshipBehaviour {
 					const setting = gameSetting as InternalSliderGameSetting;
 					const go = Object.Instantiate(this.sliderPrefab, this.gamePageSettingsContainer);
 					const settingsSlider = go.GetAirshipComponent<SettingsSlider>()!;
-					settingsSlider.Init(gameSetting.name, setting.value as number, setting.min, setting.max);
+					settingsSlider.Init(gameSetting.name, setting.value as number, setting.min, setting.max, setting.increment);
 					this.bin.Add(
 						settingsSlider.onChange.Connect((val) => {
 							Protected.Settings.SetGameSetting(setting.name, val);
@@ -177,18 +177,18 @@ export default class SettingsPage extends AirshipBehaviour {
 			settings.SetSprintToggleEnabled(val);
 		});
 
-		this.mouseSensitivitySlider.Init("Mouse Sensitivity", settings.GetMouseSensitivity(), 0.01, 2);
+		this.mouseSensitivitySlider.Init("Mouse Sensitivity", settings.GetMouseSensitivity(), 0.01, 2, 0.01);
 		this.mouseSensitivitySlider.onChange.Connect((val) => {
 			settings.SetMouseSensitivity(val);
 		});
 
-		this.mouseSmoothingSlider.Init("Mouse Smoothing", settings.GetMouseSmoothing(), 0, 2);
+		this.mouseSmoothingSlider.Init("Mouse Smoothing", settings.GetMouseSmoothing(), 0, 2, 0.01);
 		this.mouseSmoothingSlider.onChange.Connect((val) => {
 			settings.SetMouseSmoothing(val);
 		});
 
 		if (Game.IsMobile()) {
-			this.touchSensitibitySlider.Init("Touch Sensitivity", settings.GetTouchSensitivity(), 0.01, 2);
+			this.touchSensitibitySlider.Init("Touch Sensitivity", settings.GetTouchSensitivity(), 0.01, 2, 0.01);
 			this.touchSensitibitySlider.onChange.Connect((val) => {
 				settings.SetTouchSensitivity(val);
 			});
@@ -196,7 +196,7 @@ export default class SettingsPage extends AirshipBehaviour {
 			this.touchSensitibitySlider.gameObject.SetActive(false);
 		}
 
-		this.volumeSlider.Init("Global Volume", settings.GetGlobalVolume(), 0, 2);
+		this.volumeSlider.Init("Global Volume", settings.GetGlobalVolume(), 0, 2, 0.01);
 		this.volumeSlider.onChange.Connect((val) => {
 			settings.SetGlobalVolume(val);
 		});
