@@ -14,8 +14,10 @@ export default class SettingsSlider extends AirshipBehaviour {
 
 	override Start(): void {}
 
-	public Init(name: string, startingValue: number, min: number, max: number, increment: number): void {
+	public Init(name: string, startingValue: number, min: number, max: number, increment?: number): void {
 		this.titleText.text = name;
+
+		if (!increment) { increment = 1 };
 
 		const slider = this.slider.GetComponent<Slider>()!;
 		let ignoreNextSliderChange = false;
