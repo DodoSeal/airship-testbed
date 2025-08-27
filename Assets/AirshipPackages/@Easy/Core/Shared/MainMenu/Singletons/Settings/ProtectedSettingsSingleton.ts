@@ -85,7 +85,7 @@ export class ProtectedSettingsSingleton {
 
 		contextbridge.callback(
 			"Settings:AddSlider",
-			(fromContext, name: string, startingValue: number, min: number, max: number) => {
+			(fromContext, name: string, startingValue: number, min: number, max: number, increment: number) => {
 				assert(min < max, "Slider: max must be greater than min.");
 
 				if (this.gameSettings.has(name)) {
@@ -109,6 +109,7 @@ export class ProtectedSettingsSingleton {
 					value,
 					min,
 					max,
+					increment,
 				};
 				this.gameSettings.set(name, setting);
 				this.gameSettingsOrdered.push(setting);

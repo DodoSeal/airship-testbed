@@ -12,4 +12,5 @@ export interface InternalGameSetting {
 export interface InternalSliderGameSetting extends InternalGameSetting {
 	min: number;
 	max: number;
+	increment: number;
 }
