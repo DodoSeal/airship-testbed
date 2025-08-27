@@ -14,7 +14,7 @@ export default class SettingsSlider extends AirshipBehaviour {
 
 	override Start(): void {}
 
-	public Init(name: string, startingValue: number, min: number, max: number, increment: number = 1): void {
+	public Init(name: string, startingValue: number, min: number, max: number, increment: number = 0.01): void {
 		this.titleText.text = name;
 
 		const slider = this.slider.GetComponent<Slider>()!;
@@ -52,10 +52,10 @@ export default class SettingsSlider extends AirshipBehaviour {
 				if (ignoreNextSliderChange) {
 					ignoreNextSliderChange = false;
 					return;
-				};
+				}
 
 				this.onChange.Fire(newValue);
-				this.inputField.text = `${math.floor(newValue * 100) / 100}`;
+				this.inputField.text = string.format("%.2f", newValue);
 			}),
 		);
 
@@ -73,8 +73,8 @@ export default class SettingsSlider extends AirshipBehaviour {
 	}
 
 	private ValidateIncrement(value: number, increment: number): number {
-		return math.round((value / increment)) * increment;
-	};
+		return math.round(value / increment) * increment;
+	}
 
 	override OnDestroy(): void {
 		this.bin.Clean();
