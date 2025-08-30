@@ -179,7 +179,7 @@ export default class SettingsPage extends AirshipBehaviour {
 			settings.SetSprintToggleEnabled(val);
 		});
 
-		const voiceChat = Bridge.GetAirshipVoiceChatNetwork();
+		let voiceChat = Bridge.GetAirshipVoiceChatNetwork();
 		this.voiceToggle.Init("Toggle Mute", settings.IsVoiceToggleEnabled());
 		this.voiceToggle.toggle.onValueChanged.Connect((val) => {
 			settings.SetVoiceToggleEnabled(val);
